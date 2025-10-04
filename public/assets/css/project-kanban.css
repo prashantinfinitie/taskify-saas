@@ -1,0 +1,106 @@
+.kanban-board {
+    min-height: 80vh;
+}
+
+/* .kanban-column {
+    min-width: 450px;
+    max-width: 450px;
+} */
+
+.kanban-column {
+    flex: 0 0 300px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+.kanban-column-body {
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+}
+
+.card-tags .badge {
+    font-size: 0.3rem;
+}
+
+
+/* Custom fonts for Kanban board */
+.kanban-board {
+    font-family: 'Work Sans', sans-serif;
+}
+
+.kanban-board .kanban-column-header {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 600;
+}
+
+.kanban-board .card-title {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 600;
+}
+
+.kanban-board .card-text,
+.kanban-board .text-muted,
+.kanban-board .badge {
+    font-family: 'Work Sans', sans-serif;
+}
+
+/* Adjust font sizes if needed */
+.kanban-board .kanban-column-header {
+    font-size: 1.1rem;
+}
+
+.kanban-board .card-title {
+    font-size: 1rem;
+}
+
+.kanban-board .card-text,
+.kanban-board .text-muted {
+    font-size: 0.9rem;
+}
+
+.kanban-board .badge {
+    font-size: 0.8rem;
+}
+
+/* Ensure good readability */
+.kanban-board {
+    color: #333;
+}
+
+.kanban-board .text-muted {
+    color: #666 !important;
+}
+
+
+
+/* Base style for cards */
+.kanban-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for dragging */
+}
+
+/* Style when dragging */
+.dragging {
+    opacity: 0.8; /* Slightly transparent when dragging */
+    transform: scale(1.05); /* Slightly larger to indicate dragging */
+    z-index: 1000; /* Ensure the card is on top of other elements */
+}
+
+/* Style for dropped cards */
+.kanban-card.dropped {
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transition on drop */
+}
+.tag-border {
+    border-left: 0.15rem solid;
+    padding-left: 0.25rem;
+}
+
+.tag-color-danger { border-left-color:    #ff3e1d; }
+.tag-color-primary { border-left-color:   #696cff; }
+.tag-color-success { border-left-color:   #71dd37; }
+.tag-color-warning { border-left-color:   #ffab00; }
+.tag-color-info { border-left-color:      #03c3ec; }
+.tag-color-secondary { border-left-color: #8592a3; }
+.tag-color-dark { border-left-color:      #233446; }
+/* Add more colors as needed */
