@@ -35,7 +35,6 @@ class AssetsImport implements OnEachRow, WithHeadingRow
             }
         }
 
-
         $rules = [
             'name' => 'required|string|max:255',
             'asset_tag' => 'required|string|unique:assets,asset_tag,NULL,id,admin_id,' . $admin->id,
@@ -59,7 +58,7 @@ class AssetsImport implements OnEachRow, WithHeadingRow
         $admin = Admin::where('user_id', auth()->id())->first();
 
         // Find or create category by name
-        $category = AssetCategory::where('name', $rowData['category'])->first();
+        $category = AssetCategory::where('name', $rowData['category'])->where('admin_id', $admin->id)->first();
 
         if (!$category) {
             $category = AssetCategory::create([

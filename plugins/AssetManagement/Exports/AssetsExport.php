@@ -16,7 +16,6 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        // dd(Asset::where('admin_id', auth()->id())->count());
 
         $admin = Admin::where('user_id', auth()->id())->first();
 

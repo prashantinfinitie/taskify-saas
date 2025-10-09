@@ -73,7 +73,7 @@ return [
         'Emails and Email Template' => array('send_email', 'create_email_template', 'manage_email_template', 'delete_email_template'),
         'Candidates' => array('create_candidate',  'manage_candidate', 'edit_candidate', 'delete_candidate'),
         'Candidate Statuses' => array('create_candidate_status',   'manage_candidate_status', 'edit_candidate_status', 'delete_candidate_status'),
-        'Interviews' => array('create_interview',  'manage_interview', 'edit_interview', 'delete_interview'),
+        'Interviews' => array('create_interview',  'manage_interview', 'edit_interview', 'delete_interview')
     ],
 
     //Modules

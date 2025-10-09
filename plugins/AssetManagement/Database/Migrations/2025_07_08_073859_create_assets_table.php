@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -14,8 +15,8 @@ return new class extends Migration
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('asset_tag')->unique();
             $table->longText('description')->nullable();
+             $table->string('asset_tag');
             $table->foreignId('admin_id')->constrained('admins')->onDelete('cascade');
             $table->unsignedBigInteger('assigned_to')->nullable();
             $table->unique(['admin_id', 'asset_tag']);
@@ -28,6 +29,16 @@ return new class extends Migration
             $table->string('purchase_cost')->nullable();
             $table->timestamps();
         });
+
+        // Insert permissions manually
+        if (Schema::hasTable('permissions')) {
+            DB::table('permissions')->insert([
+                ['name' => 'manage_assets', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'create_assets', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'edit_assets', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'delete_assets', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ]);
+        }
     }
 
     /**
@@ -35,6 +46,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+
+        DB::table('permissions')->whereIn('name', ['manage_assets', 'create_assets', 'edit_assets', 'delete_assets'])->delete();
         Schema::dropIfExists('assets');
     }
 };
+

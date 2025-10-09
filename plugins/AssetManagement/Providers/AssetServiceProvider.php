@@ -1,12 +1,13 @@
 <?php
 namespace Plugins\AssetManagement\Providers;
 
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\File;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\ServiceProvider;
 use Plugins\AssetManagement\Models\Asset;
+use Illuminate\Console\Scheduling\Schedule;
 
 class AssetServiceProvider extends ServiceProvider
 {
@@ -45,14 +46,15 @@ class AssetServiceProvider extends ServiceProvider
         // Optional: Add scheduled tasks for Asset plugin
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
-            // Example:
-            // $schedule->command('asset:cleanup-unused')->dailyAt('01:00');
         });
 
         // Dynamically add the `assets` relationship to User
         User::resolveRelationUsing('assets', function ($userModel) {
             return $userModel->hasMany(Asset::class, 'assigned_to');
         });
+
+
+        $this->mergePluginPermissions();
     }
 
     public function register(): void
@@ -105,5 +107,32 @@ class AssetServiceProvider extends ServiceProvider
         $destTime = File::lastModified($destinationPath);
 
         return $sourceTime > $destTime;
+    }
+
+
+
+    protected function mergePluginPermissions()
+    {
+        $pluginPermissions = [];
+
+        // Example: load all enabled plugins from your plugins directory
+        $pluginsPath = base_path('plugins');
+
+        foreach (glob($pluginsPath . '/*', GLOB_ONLYDIR) as $pluginDir) {
+            $configFile = $pluginDir . '/config/permissions.php';
+
+            if (file_exists($configFile)) {
+                $permissions = include $configFile;
+
+                if (is_array($permissions)) {
+                    $pluginPermissions = array_merge($pluginPermissions, $permissions);
+                }
+            }
+        }
+
+        // Merge with existing config
+        $existingPermissions = Config::get('taskify.permissions', []);
+
+        Config::set('taskify.permissions', array_merge($existingPermissions, $pluginPermissions));
     }
 }

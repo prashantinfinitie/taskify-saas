@@ -13,18 +13,6 @@ use Plugins\AssetManagement\Models\AssetCategory;
 class AssetsCategoryController extends Controller
 {
 
-
-    private function getWorkspaceUsers(){
-
-        $workspace = Workspace::find(session()->get('workspace_id'));
-
-        if(!$workspace){
-            return collect([]);
-        }
-
-        return $workspace->users();
-    }
-
     private function getWorkspaceAssetsCategoriesQuery(){
 
         $workspace = Workspace::find(session()->get('workspace_id'));
@@ -39,11 +27,12 @@ class AssetsCategoryController extends Controller
 
     }
 
-
-
-
     public function index()
     {
+
+        if (!isAdminOrHasAllDataAccess()) {
+            abort(403, 'UnAuthorized Access');
+        }
 
         $workspace = Workspace::find(session()->get('worksapce_id'));
 
@@ -52,6 +41,7 @@ class AssetsCategoryController extends Controller
         }
 
         $categories = $this->getWorkspaceAssetsCategoriesQuery()->get();
+        // dd($categories);
 
         return view('assets::assets.category.index', compact('categories'));
     }
@@ -178,6 +168,7 @@ class AssetsCategoryController extends Controller
         $sort = request('sort', 'id');
 
         $admin = Admin::where('user_id', auth()->id())->first();
+        // dd($admin);
         $query = AssetCategory::query()->where('admin_id', $admin->id);
 
         if ($search) {
@@ -188,8 +179,8 @@ class AssetsCategoryController extends Controller
         }
 
         $total = $query->count();
-        $canEdit = isAdminOrHasAllDataAccess();
-        $canDelete = isAdminOrHasAllDataAccess();
+        $canEdit = checkPermission('edit_asset_categories');
+        $canDelete = checkPermission('delete_asset_categories');
 
         $assetCategories = $query->orderBy($sort, $order)
             ->skip($offset)

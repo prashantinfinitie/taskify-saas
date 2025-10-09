@@ -3459,6 +3459,16 @@
                             {!! create_label('seamless_collaboration_for_team_success', 'Connect your team with real-time communication, shared tasks, and seamless file sharing to boost teamwork and productivity.', Session::get('locale')) !!}
 
                         </div>
+                             {{-- Plugin Labels --}}
+                            @php
+                                use App\Helpers\PluginHelper;
+                                $pluginLabels = PluginHelper::getPluginLabels();
+                            @endphp
+                            <div class="row">
+                                @foreach ($pluginLabels as $key => $value)
+                                    {!! create_label($key, $value, Session::get('locale')) !!}
+                                @endforeach
+                            </div>
 
                         <div class="row">
 

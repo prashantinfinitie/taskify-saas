@@ -79,6 +79,7 @@ class AssetsController extends Controller
 
             $assets = $this->getWorkspaceAssetsQuery()
                 ->where('assigned_to', auth()->id())
+                ->orWhere('assigned_to', auth()->id())
                 ->get();
         }
 
@@ -611,9 +612,9 @@ class AssetsController extends Controller
 
         $total = $query->count();
 
-        $canEdit = isAdminOrHasAllDataAccess();
-        $canDelete = isAdminOrHasAllDataAccess();
-        $canCreate = isAdminOrHasAllDataAccess();
+        $canEdit = checkPermission('edit_assets');
+        $canDelete = checkPermission('delete_assets');
+        $canCreate = checkPermission('create_assets');
 
         $assets = $query->orderBy($sort, $order)
             ->take($limit)
@@ -631,24 +632,24 @@ class AssetsController extends Controller
                     $assetData['purchase_date'] = format_date($asset->purchase_date, false, 'Y-m-d\TH:i:s.u\Z', 'Y-m-d');
 
                     $actions .= '<a href="javascript:void(0);"
-    class="updateAssetOffcanvasBtn"
-    data-bs-toggle="offcanvas"
-    data-bs-target="#updateAssetOffcanvas"
-    data-asset=\'' . htmlspecialchars(json_encode($assetData), ENT_QUOTES, 'UTF-8') . '\'
-    title="' . get_label('update', 'Update') . '">
-    <i class="bx bx-edit text-primary mx-1"></i>
-</a>';
+                        class="updateAssetOffcanvasBtn"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#updateAssetOffcanvas"
+                        data-asset=\'' . htmlspecialchars(json_encode($assetData), ENT_QUOTES, 'UTF-8') . '\'
+                        title="' . get_label('update', 'Update') . '">
+                        <i class="bx bx-edit text-primary mx-1"></i>
+                    </a>';
                 }
 
                 // Delete button (icon)
                 if ($canDelete) {
                     $actions .= '<button type="button"
-        class="btn delete"
-        data-id="' . $asset->id . '"
-        data-type="assets"
-        title="' . get_label('delete', 'Delete') . '">
-        <i class="bx bx-trash text-danger mx-1"></i>
-    </button>';
+                    class="btn delete"
+                    data-id="' . $asset->id . '"
+                    data-type="assets"
+                    title="' . get_label('delete', 'Delete') . '">
+                    <i class="bx bx-trash text-danger mx-1"></i>
+                </button>';
                 }
 
                 // Duplicate Assets
@@ -744,7 +745,6 @@ class AssetsController extends Controller
 
     public function search(Request $request)
     {
-        // dd($request);
         $query = $request->input('q');
         $type = $request->input('type');
         $results = [];
@@ -806,8 +806,8 @@ class AssetsController extends Controller
             ]);
 
             $originalAsset = $this->getWorkspaceAssetsQuery()
-                                    ->with(['category'])
-                                    ->findOrFail($id);
+                ->with(['category'])
+                ->findOrFail($id);
 
             DB::beginTransaction();
 

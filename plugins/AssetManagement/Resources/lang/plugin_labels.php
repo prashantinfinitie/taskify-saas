@@ -122,9 +122,5 @@ return [
     'category_names_should_match_existing_categories'=>'Category names should match existing categories',
     'asset_tags_must_be_unique'=>'Asset tags must be unique',
     'upload_errors'=>'Upload Errors:',
-    'validation_errors'=>'Validation Errors:'
-
-
-
-
+    'validation_errors' => 'Validation Errors:'
 ];

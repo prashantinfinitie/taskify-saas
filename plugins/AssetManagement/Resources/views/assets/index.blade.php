@@ -81,21 +81,24 @@
                                     data-placeholder="{{ get_label('filter_by_assigned_users', 'Filter by Assigned Users ') }}"
                                     data-allow-clear="true" multiple></select>
                             </div>
+
+                            <div class="col-md-4 mb-3">
+                                <select class="form-select asset_status" id="asset_status" name="asset_status"
+                                    aria-label="Default select example"
+                                    data-placeholder="{{ get_label('filter_by_statuses', 'Filter by statuses') }}"
+                                    data-allow-clear="true" multiple>
+                                    <option value=""></option>
+                                    <option value="available">{{ get_label('available', 'Available') }}</option>
+                                    <option value="non-functional">{{ get_label('non_functional', 'Non-Functional') }}
+                                    </option>
+                                    <option value="lost">{{ get_label('lost', 'Lost') }}</option>
+                                    <option value="damaged">{{ get_label('damaged', 'Damaged') }}</option>
+                                    <option value="lent">{{ get_label('lent', 'Lent') }}</option>
+                                    <option value="under-maintenance">
+                                        {{ get_label('under_maintenance', 'Under Maintenance') }}</option>
+                                </select>
+                            </div>
                         @endif
-                        <div class="col-md-4 mb-3">
-                            <select class="form-select asset_status" id="asset_status" name="asset_status"
-                                aria-label="Default select example"
-                                data-placeholder="{{ get_label('filter_by_statuses', 'Filter by statuses') }}"
-                                data-allow-clear="true" multiple>
-                                <option value=""></option>
-                                <option value="available">{{ get_label('available', 'Available') }}</option>
-                                <option value="non-functional">{{ get_label('non_functional', 'Non-Functional') }}</option>
-                                <option value="lost">{{ get_label('lost', 'Lost') }}</option>
-                                <option value="damaged">{{ get_label('damaged', 'Damaged') }}</option>
-                                <option value="lent">{{ get_label('lent', 'Lent') }}</option>
-                                <option value="under-maintenance">{{ get_label('under_maintenance', 'Under Maintenance') }}</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="table-responsive text-nowrap">
                         <input type="hidden" id="data_type" value="assets">
@@ -161,17 +164,16 @@
                             <h2 class="mx-2 mb-2">
                                 <span>{{ get_label('assets_not_found', 'Assets Not Found') }}</span>
                             </h2>
-                            <p class="mx-2 mb-4">{{get_label('no_data_available','Oops! No data available yet.')}}</p>
-                            <a href="javascript:void(0);"
-                                class="btn btn-md btn-primary action_create_template m-1"
+                            <p class="mx-2 mb-4">{{ get_label('no_data_available', 'Oops! No data available yet.') }}</p>
+                            <a href="javascript:void(0);" class="btn btn-md btn-primary action_create_template m-1"
                                 id="createAssetModalBtn" data-bs-toggle="offcanvas"
                                 data-bs-target="#createAssetOffcanvas"
                                 title="{{ get_label('create_asset', 'Create Asset') }}">
                                 {{ get_label('create_now', 'Create now') }}
                             </a>
                             <div class="mt-3">
-                                <img src="{{ asset('/storage/no-result.png') }}" alt="No result"
-                                    width="500" class="img-fluid" />
+                                <img src="{{ asset('/storage/no-result.png') }}" alt="No result" width="500"
+                                    class="img-fluid" />
                             </div>
                         </div>
                     </div>

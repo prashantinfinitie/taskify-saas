@@ -5,14 +5,14 @@ use Plugins\AssetManagement\Controllers\AssetsController;
 use Plugins\AssetManagement\Controllers\AssetsCategoryController;
 
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::prefix('master-panel')->middleware(['multiguard', 'custom-verified', 'check.subscription', 'subscription.modules'])->group(function () {
+    Route::prefix('master-panel')->middleware(['multiguard', 'custom-verified', 'check.subscription', 'subscription.modules', 'customcan:manage_assets'])->group(function () {
         Route::prefix('assets')->group(function () {
             Route::get('/index', [AssetsController::class, 'index'])->name('assets.index');
             Route::get('/show/{id}', [AssetsController::class, 'show'])->name('assets.show');
-            Route::post('/store', [AssetsController::class, 'store'])->name('assets.store');
-            Route::post('/update/{id}', [AssetsController::class, 'update'])->name('assets.update');
-            Route::delete('/destroy/{id}', [AssetsController::class, 'destroy'])->name('assets.destroy');
-            Route::post('/destroy_multiple', [AssetsController::class, 'destroy_multiple'])->name('assets.destroy_multiple');
+            Route::post('/store', [AssetsController::class, 'store'])->name('assets.store')->middleware('customcan:create_assets');
+            Route::post('/update/{id}', [AssetsController::class, 'update'])->name('assets.update')->middleware('customcan:edit_assets');
+            Route::delete('/destroy/{id}', [AssetsController::class, 'destroy'])->name('assets.destroy')->middleware('customcan:delete_assets');
+            Route::delete('/destroy_multiple', [AssetsController::class, 'destroy_multiple'])->name('assets.destroy_multiple')->middleware('customcan:delete_assets');
             Route::get('/list', [AssetsController::class, 'list'])->name('assets.list');
             Route::post('/{id}/lend', [AssetsController::class, 'lend'])->name('assets.lend');
             Route::post('/{id}/return', [AssetsController::class, 'returnAsset'])->name('assets.return');
@@ -25,10 +25,10 @@ Route::middleware(['web', 'auth'])->group(function () {
 
             // category
             Route::get('/category/index', [AssetsCategoryController::class, 'index'])->name('assets.category.index');
-            Route::post('/category/store', [AssetsCategoryController::class, 'store'])->name('assets.category.store');
-            Route::post('/category/update/{id}', [AssetsCategoryController::class, 'update'])->name('assets.category.update');
-            Route::delete('/category/destroy/{id}', [AssetsCategoryController::class, 'destroy'])->name('assets.category.destroy');
-            Route::post('/category/destroy_multiple', [AssetsCategoryController::class, 'destroy_multiple'])->name('assets.category.destroy_multiple');
+            Route::post('/category/store', [AssetsCategoryController::class, 'store'])->name('assets.category.store')->middleware('customcan:create_asset_categories');;
+            Route::post('/category/update/{id}', [AssetsCategoryController::class, 'update'])->name('assets.category.update')->middleware('customcan:edit_asset_categories');;
+            Route::delete('/category/destroy/{id}', [AssetsCategoryController::class, 'destroy'])->name('assets.category.destroy')->middleware('customcan:delete_asset_categories');;
+            Route::delete('/category/destroy_multiple', [AssetsCategoryController::class, 'destroy_multiple'])->name('assets.category.destroy_multiple')->middleware('customcan:delete_asset_categories');;
             Route::get('/category/list', [AssetsCategoryController::class, 'list'])->name('assets.category.list');
         });
     });

@@ -1,3 +1,5 @@
+"use strict";
+
 // ajax for all forms
 $(document).on("submit", ".asset-form-submit-event", function (e) {
     e.preventDefault();
@@ -12,7 +14,6 @@ $(document).on("submit", ".asset-form-submit-event", function (e) {
     var button_text = btn_html != "" || btn_html != "undefined" ? btn_html : btn_val;
     var tableInput = currentForm.find('input[name="table"]');
     var tableID = tableInput.length ? tableInput.val() : "table";
-
     $.ajax({
         type: "POST",
         url: $(this).attr("action"),
@@ -259,8 +260,7 @@ function displayAssetValidationErrors(form, errors) {
 
 // For searching in table
 function queryParams(params) {
-
-    const query = {
+    var query = {
         limit: params.limit,
         offset: params.offset,
         search: params.search,
@@ -294,18 +294,34 @@ $(document).on('click', '#createCategoryModalBtn', function () {
 
 // For duplicating asset
 $(document).on('click', '.duplicateAsset', function () {
-    const asset = $(this).data('asset');
-    const actionUrl = `/master-panel/assets/duplicate/${asset.id}`;
+    var asset = $(this).data('asset');
+    var actionUrl = '/master-panel/assets/duplicate/' + asset.id;
 
     $('#duplicateForm').attr('action', actionUrl);
     $('#duplicateAssetModal').modal('show');
 });
 
+
+// For showing and filling update asset category modal
+$(document).on('click', '.updateCategoryModal', function () {
+    const assetCategory = $(this).data('asset-category');
+    const color = assetCategory.color;
+    const actionUrl = `/master-panel/assets/category/update/${assetCategory.id}`;
+    $('#updateCategoryForm').attr('action', actionUrl);
+    console.log($('#updateCategoryForm').attr('action', actionUrl));
+    $('#categoryName').val(assetCategory.name);
+    $('#categoryDescription').val(assetCategory.description);
+    $('#category_color').val(color).change();
+    $('#category_color')
+        .removeClass('select-bg-label-primary select-bg-label-secondary select-bg-label-success select-bg-label-danger select-bg-label-warning select-bg-label-info select-bg-label-dark')
+        .addClass(`select-bg-label-${color}`);
+    $('#updateCategoryModal').modal('show');
+});
+
 // Show update modal
 $(document).on('click', '.updateAssetOffcanvasBtn', function () {
-    const asset = $(this).data('asset');
-    const actionUrl = `/master-panel/assets/update/${asset.id}`;
-
+    var asset = $(this).data('asset');
+    var actionUrl = '/master-panel/assets/update/' + asset.id;
 
     $('#updateAssetForm').attr('action', actionUrl);
     $('#update-asset-name').val(asset.name);
@@ -325,14 +341,12 @@ $(document).on('click', '.updateAssetOffcanvasBtn', function () {
     if (asset.status == 'lent') {
         $('#update_asset_status_field').hide();
         $('#update-lent-status').remove();
-        $('#updateAssetForm').append(`<input type="hidden" id="update-lent-status" name="status" value="${asset.status}">`);
+        $('#updateAssetForm').append('<input type="hidden" id="update-lent-status" name="status" value="' + asset.status + '">');
         $('#update-asset-status').removeAttr('name');
     } else {
         $('#update_asset_status_field').show();
         $('#update-lent-status').remove();
-        // $('#update-asset-status').attr('name', 'status').val(asset.status);
         $('#update-asset-status').val(asset.status).trigger('change');
-
     }
 
     $('#update-asset-picture').val('');
@@ -341,11 +355,11 @@ $(document).on('click', '.updateAssetOffcanvasBtn', function () {
 
 // Handle file input change for both modals
 $(document).on('change', '.asset-picture-input', function () {
-    const file = this.files[0];
-    const modal = $(this).data('modal');
+    var file = this.files[0];
+    var modal = $(this).data('modal');
 
     if (file) {
-        const reader = new FileReader();
+        var reader = new FileReader();
         reader.onload = function (e) {
             showImagePreview(modal, e.target.result);
         };
@@ -355,8 +369,8 @@ $(document).on('change', '.asset-picture-input', function () {
 
 // Open full image in lightbox
 $(document).on('click', '.open-full-image-btn', function () {
-    const targetImg = $(this).data('target');
-    const imgSrc = $(`#${targetImg}`).attr('src');
+    var targetImg = $(this).data('target');
+    var imgSrc = $('#' + targetImg).attr('src');
 
     if (imgSrc) {
         $('#lightboxImage').attr('src', imgSrc);
@@ -366,7 +380,7 @@ $(document).on('click', '.open-full-image-btn', function () {
 
 // Also allow clicking on image to open lightbox
 $(document).on('click', '#create-preview-image, #update-preview-image', function () {
-    const imgSrc = $(this).attr('src');
+    var imgSrc = $(this).attr('src');
     if (imgSrc) {
         $('#lightboxImage').attr('src', imgSrc);
         $('#imageLightboxModal').modal('show');
@@ -375,9 +389,9 @@ $(document).on('click', '#create-preview-image, #update-preview-image', function
 
 // Remove image functionality
 $(document).on('click', '.remove-image-btn', function () {
-    const modal = $(this).data('modal');
+    var modal = $(this).data('modal');
     resetImagePreview(modal);
-    $(`#${modal}-asset-picture`).val('');
+    $('#' + modal + '-asset-picture').val('');
     $('#update_remove_picture').val(1);
 });
 
@@ -403,22 +417,22 @@ $(document).on('hidden.bs.modal', '#updateAssetModal', function () {
 
 // Helper functions
 function showImagePreview(modal, src) {
-    const preview = $(`#${modal}-preview-image`);
-    const currentPreview = $(`#${modal}-current-picture-preview`);
-    const actions = $(`#${modal}-image-actions`);
-    const placeholder = $(`#${modal}-no-image-placeholder`);
+    var preview = $('#' + modal + '-preview-image');
+    var currentPreview = $('#' + modal + '-current-picture-preview');
+    var actions = $('#' + modal + '-image-actions');
+    var placeholder = $('#' + modal + '-no-image-placeholder');
 
     preview.attr('src', src);
-    currentPreview.css('display', 'block'); // ensures visibility
-    actions.css('display', 'grid'); // override inline style
+    currentPreview.css('display', 'block');
+    actions.css('display', 'grid');
     placeholder.css('display', 'none');
 }
 
 function resetImagePreview(modal) {
-    const preview = $(`#${modal}-preview-image`);
-    const currentPreview = $(`#${modal}-current-picture-preview`);
-    const actions = $(`#${modal}-image-actions`);
-    const placeholder = $(`#${modal}-no-image-placeholder`);
+    var preview = $('#' + modal + '-preview-image');
+    var currentPreview = $('#' + modal + '-current-picture-preview');
+    var actions = $('#' + modal + '-image-actions');
+    var placeholder = $('#' + modal + '-no-image-placeholder');
 
     preview.attr('src', '');
     currentPreview.css('display', 'none');
@@ -431,16 +445,16 @@ $(document).ready(function () {
     $('#lendAssetForm').on('submit', function (e) {
         e.preventDefault();
 
-        const $form = $(this);
-        const formData = new FormData(this);
-        const assetId = formData.get('asset_id');
+        var $form = $(this);
+        var formData = new FormData(this);
+        var assetId = formData.get('asset_id');
 
         $.ajax({
-            url: `/master-panel/assets/${assetId}/lend`,
+            url: '/master-panel/assets/' + assetId + '/lend',
             method: 'POST',
             data: formData,
-            processData: false, // Important for FormData
-            contentType: false, // Important for FormData
+            processData: false,
+            contentType: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -452,16 +466,16 @@ $(document).ready(function () {
 
                 toastr.success(data.message);
 
-                // Hide modal
-                const modalEl = document.getElementById('lendAssetModal');
-                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                var modalEl = document.getElementById('lendAssetModal');
+                var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
                 modal.hide();
 
-                // Reload after short delay
-                setTimeout(() => location.reload(), 1500);
+                setTimeout(function () {
+                    window.location.href = '/master-panel/assets/index';
+                }, 1500);
             },
             error: function (xhr) {
-                let message = 'An unexpected error occurred.';
+                var message = 'An unexpected error occurred.';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     message = xhr.responseJSON.message;
                 }
@@ -475,46 +489,44 @@ $(document).ready(function () {
 $('#returnAssetForm').on('submit', function (e) {
     e.preventDefault();
 
-    const formData = new FormData(this);
-    const assetId = formData.get('asset_id');
+    var formData = new FormData(this);
+    var assetId = formData.get('asset_id');
 
     $.ajax({
-        url: `/master-panel/assets/${assetId}/return`,
+        url: '/master-panel/assets/' + assetId + '/return',
         type: 'POST',
         data: formData,
-        processData: false, // Important for FormData
-        contentType: false, // Important for FormData
+        processData: false,
+        contentType: false,
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function (data) {
             toastr.success(data.message);
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('returnAssetModal'));
+            var modal = bootstrap.Modal.getInstance(document.getElementById('returnAssetModal'));
             modal.hide();
 
             console.log(window.location.href);
-            setTimeout(() => {
-                window.location.reload();
+            setTimeout(function () {
+                window.location.href = '/master-panel/assets/index';
             }, 1500);
         },
         error: function (xhr) {
-            let errorMsg = 'An error occurred while returning the asset.';
+            var errorMsg = 'An error occurred while returning the asset.';
             if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
             }
             toastr.error(errorMsg);
-
         }
     });
 });
 
-
 // Set minimum date for estimated return date
 document.addEventListener('DOMContentLoaded', function () {
-    const tomorrow = new Date();
+    var tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const estimatedReturnDateInput = document.getElementById('estimated_return_date');
+    var estimatedReturnDateInput = document.getElementById('estimated_return_date');
     if (estimatedReturnDateInput) {
         estimatedReturnDateInput.min = tomorrow.toISOString().slice(0, 16);
     }
@@ -533,9 +545,9 @@ $(document).ready(function () {
         $this.select2({
             allowClear: true,
             dropdownParent: dropdownParent,
-            minimumResultsForSearch: 0, // Enable search even for few options
+            minimumResultsForSearch: 0,
             placeholder: $this.data('placeholder') || 'Select Status',
-            width: '100%' // Ensure full width
+            width: '100%'
         });
     });
 });
@@ -548,7 +560,6 @@ function initAssetSelect2(selector, type) {
         var allowClear = $this.data("allow-clear") !== "false";
         var singleSelect = $this.data("single-select") !== false;
 
-        // Determine the dropdown parent (modal or offcanvas)
         var dropdownParent = undefined;
         if ($this.closest(".modal").length && singleSelect) {
             dropdownParent = $this.closest(".modal");
@@ -588,7 +599,7 @@ function initAssetSelect2(selector, type) {
             minimumInputLength: 0,
             allowClear: allowClear,
             closeOnSelect: singleSelect,
-            dropdownParent: dropdownParent, // Use the determined parent
+            dropdownParent: dropdownParent,
             language: {
                 inputTooShort: function () {
                     return "Please type at least 1 character";
@@ -609,18 +620,17 @@ function initAssetSelect2(selector, type) {
 }
 
 function updateURLQueryParam(param, value) {
-    const url = new URL(window.location);
+    var url = new URL(window.location);
 
     if (value === null || value.length === 0) {
         url.searchParams.delete(param);
     } else {
-        const paramValue = Array.isArray(value) ? value.join(",") : value;
+        var paramValue = Array.isArray(value) ? value.join(",") : value;
         url.searchParams.set(param, paramValue);
     }
 
     window.history.replaceState({}, '', url);
 }
-
 
 $(document).ready(function () {
     initAssetSelect2('.select-asset-category', "asset_category");
@@ -629,38 +639,36 @@ $(document).ready(function () {
     initAssetSelect2('.select-asset-assigned_to_in_filter', "users");
     initAssetSelect2('.select-assets', "assets");
 
-    // Update URL on select change
     $('.select-asset-category_in_filter').on('change', function () {
-        const selected = $(this).val() || [];
+        var selected = $(this).val() || [];
         updateURLQueryParam('categories', selected);
     });
 
     $('.select-asset-assigned_to_in_filter').on('change', function () {
-        const selected = $(this).val() || [];
+        var selected = $(this).val() || [];
         updateURLQueryParam('users', selected);
     });
 
     $('#asset_status').on('change', function () {
-        const selected = $(this).val();
+        var selected = $(this).val();
         updateURLQueryParam('asset_status', selected ? [selected] : []);
     });
 
-    // Preselect based on URL
-    const urlParams = new URLSearchParams(window.location.search);
+    var urlParams = new URLSearchParams(window.location.search);
 
-    const categories = urlParams.get('categories');
+    var categories = urlParams.get('categories');
     if (categories) {
-        const selected = categories.split(',');
+        var selected = categories.split(',');
         $('.select-asset-category').val(selected).trigger('change');
     }
 
-    const users = urlParams.get('users');
+    var users = urlParams.get('users');
     if (users) {
-        const selected = users.split(',');
-        $('.select-asset-assigned_to').val(selected).trigger('change');
+        var selectedUsers = users.split(',');
+        $('.select-asset-assigned_to').val(selectedUsers).trigger('change');
     }
 
-    const assetStatus = urlParams.get('asset_status');
+    var assetStatus = urlParams.get('asset_status');
     if (assetStatus) {
         $('#asset_status').val(assetStatus).trigger('change');
     }
@@ -668,13 +676,12 @@ $(document).ready(function () {
 
 // Assets plugin main functionality
 $(document).ready(function () {
-    // Ensure CSRF token is included in AJAX requests
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    // Handle form submission for bulkAssetsUploadModal
+
     $('#bulkAssetsUploadOffcanvas .form-submit-event').on('submit', function (e) {
         e.preventDefault();
 
@@ -683,10 +690,8 @@ $(document).ready(function () {
         var $uploadErrors = $('#uploadErrors');
         var $uploadErrorsList = $('#uploadErrorsList');
 
-        // Clear previous errors
         $uploadErrors.addClass('d-none').find('#uploadErrorsList').empty();
 
-        // Disable submit button and show loading state
         $submitBtn.prop('disabled', true).html('<i class="bx bx-loader bx-spin"></i> {{ get_label("importing", "Importing...") }}');
 
         var formData = new FormData($form[0]);
@@ -699,70 +704,61 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 if (response.error) {
-                    // Handle validation errors - keep canvas open and show errors
                     if (response.validation_errors && response.validation_errors.length > 0) {
-                        let errorHtml = '';
+                        var errorHtml = '';
                         response.validation_errors.forEach(function (error) {
-                            errorHtml += `<li>Row ${error.row}: ${error.messages.join(', ')}</li>`;
+                            errorHtml += '<li>Row ' + error.row + ': ' + error.messages.join(', ') + '</li>';
                         });
                         $uploadErrorsList.html(errorHtml);
                     } else {
-                        $uploadErrorsList.html(`<li>${response.message}</li>`);
+                        $uploadErrorsList.html('<li>' + response.message + '</li>');
                     }
                     $uploadErrors.removeClass('d-none');
                 } else {
-                    // Success - close canvas and reload page
                     $('#bulkAssetsUploadOffcanvas').modal('hide');
                     toastr.success(response.message);
                     location.reload();
                 }
             },
             error: function (xhr) {
-                // Handle different error scenarios - keep canvas open and show errors
                 if (xhr.status === 422) {
-                    // Validation errors
                     try {
                         var response = JSON.parse(xhr.responseText);
                         if (response.validation_errors && response.validation_errors.length > 0) {
-                            let errorHtml = '';
+                            var errorHtml = '';
                             response.validation_errors.forEach(function (error) {
-                                errorHtml += `<li>Row ${error.row}: ${error.messages.join(', ')}</li>`;
+                                errorHtml += '<li>Row ' + error.row + ': ' + error.messages.join(', ') + '</li>';
                             });
                             $uploadErrorsList.html(errorHtml);
                         } else {
-                            $uploadErrorsList.html(`<li>${response.message || 'Validation failed.'}</li>`);
+                            $uploadErrorsList.html('<li>' + (response.message || 'Validation failed.') + '</li>');
                         }
                     } catch (e) {
                         $uploadErrorsList.html('<li>An error occurred during validation. Please try again.</li>');
                     }
                     $uploadErrors.removeClass('d-none');
                 } else if (xhr.status === 413) {
-                    // File too large
                     $uploadErrorsList.html('<li>The uploaded file is too large. Please try a smaller file.</li>');
                     $uploadErrors.removeClass('d-none');
                 } else if (xhr.status === 500) {
-                    // Server error
                     try {
                         var response = JSON.parse(xhr.responseText);
-                        $uploadErrorsList.html(`<li>${response.message || 'An internal server error occurred.'}</li>`);
+                        $uploadErrorsList.html('<li>' + (response.message || 'An internal server error occurred.') + '</li>');
                     } catch (e) {
                         $uploadErrorsList.html('<li>An internal server error occurred. Please try again.</li>');
                     }
                     $uploadErrors.removeClass('d-none');
                 } else {
-                    // Generic error
                     $uploadErrorsList.html('<li>An error occurred during the upload. Please try again.</li>');
                     $uploadErrors.removeClass('d-none');
                 }
             },
             complete: function () {
-                // Re-enable submit button
                 $submitBtn.prop('disabled', false).html('{{ get_label("import", "Import") }}');
             }
         });
     });
 
-    // Client-side file validation
     $('#bulkAssetsUploadOffcanvas input[name="file"]').on('change', function () {
         var file = this.files[0];
         var $uploadErrors = $('#uploadErrors');
@@ -779,7 +775,7 @@ $(document).ready(function () {
             }
         }
     });
-    // Function to initialize Asset Analytics Chart
+
     function initAssetAnalyticsChart() {
         if (typeof window.assetAnalyticsData !== 'undefined' && $('#statusChart').length > 0) {
             var options = {
@@ -820,6 +816,3 @@ $(document).ready(function () {
 
     initAssetAnalyticsChart();
 });
-
-
-

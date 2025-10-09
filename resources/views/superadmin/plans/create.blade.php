@@ -220,9 +220,6 @@
                                                 <i class="<?= $data['icon'] ?>"></i>
                                                 <?= get_label($module, ucfirst($module)) ?>
                                             </h5>
-
-
-
                                             <div class="card-body">
 
                                                 <p class="card-text">
