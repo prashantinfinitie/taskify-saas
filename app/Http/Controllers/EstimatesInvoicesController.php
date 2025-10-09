@@ -119,8 +119,8 @@ class EstimatesInvoicesController extends Controller
             $type = $request->input('type');
             $from_date = $request->input('from_date');
             $to_date = $request->input('to_date');
-            $from_date = Carbon::createFromFormat('m-d-Y', $from_date);
-            $to_date = Carbon::createFromFormat('m-d-Y', $to_date);
+            $from_date = Carbon::createFromFormat(app('php_date_format'), $from_date);
+            $to_date = Carbon::createFromFormat(app('php_date_format'), $to_date);
 
             $formFields['from_date'] = format_date($from_date, false, app('php_date_format'), 'Y-m-d');
             $formFields['to_date'] = format_date($to_date, false, app('php_date_format'), 'Y-m-d');

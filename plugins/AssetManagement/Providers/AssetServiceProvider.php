@@ -54,7 +54,7 @@ class AssetServiceProvider extends ServiceProvider
         });
 
         // Merge plugin permissions with system permissions
-        $this->mergePluginPermissions();
+        $this->mergePluginConfig();
     }
 
     public function register(): void
@@ -110,29 +110,33 @@ class AssetServiceProvider extends ServiceProvider
     }
 
 
-
-    protected function mergePluginPermissions()
+    protected function mergePluginConfig()
     {
-        $pluginPermissions = [];
 
-        // Example: load all enabled plugins from your plugins directory
-        $pluginsPath = base_path('plugins');
+        $pluginPath = __DIR__ . '/../config';
 
-        foreach (glob($pluginsPath . '/*', GLOB_ONLYDIR) as $pluginDir) {
-            $configFile = $pluginDir . '/config/permissions.php';
+        // For permissions
+        $permissionFile = $pluginPath . '/permissions.php';
+        if (file_exists($permissionFile)) {
 
-            if (file_exists($configFile)) {
-                $permissions = include $configFile;
+            $permissions = include $permissionFile;
 
-                if (is_array($permissions)) {
-                    $pluginPermissions = array_merge($pluginPermissions, $permissions);
-                }
+            if (is_array($permissions)) {
+                config()->set('taskify.permissions', array_merge(config('taskify.permissions', []), $permissions));
             }
         }
 
-        // Merge with existing config
-        $existingPermissions = Config::get('taskify.permissions', []);
+        // For module
 
-        Config::set('taskify.permissions', array_merge($existingPermissions, $pluginPermissions));
+        $moduleFile = $pluginPath . '/module.php';
+
+        if (file_exists($moduleFile)) {
+
+            $module = include $moduleFile;
+
+            if (is_array($module)) {
+                config()->set('taskify.modules', array_merge(config('taskify.modules', []), $module));
+            }
+        }
     }
 }

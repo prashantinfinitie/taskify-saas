@@ -86,7 +86,6 @@ return [
         'contracts' => ['icon' => 'bx bx-news', 'description' => 'Manage contracts and agreements with clients'],
         'payslips' => ['icon' => 'bx bx-box', 'description' => 'View and manage payslips for employees'],
         'finance' => ['icon' => 'bx bx-dollar', 'description' => 'Create and Manange Expenses Payments and Invoice Estimates'],
-        'assets' => ['icon' => 'bx bx-desktop', 'description' => 'Create and Manange Assets Efficiently.'],
     ],
 
 ];
