@@ -53,7 +53,7 @@ class AssetServiceProvider extends ServiceProvider
             return $userModel->hasMany(Asset::class, 'assigned_to');
         });
 
-
+        // Merge plugin permissions with system permissions
         $this->mergePluginPermissions();
     }
 

@@ -168,7 +168,6 @@ class AssetsCategoryController extends Controller
         $sort = request('sort', 'id');
 
         $admin = Admin::where('user_id', auth()->id())->first();
-        // dd($admin);
         $query = AssetCategory::query()->where('admin_id', $admin->id);
 
         if ($search) {

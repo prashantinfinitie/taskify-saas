@@ -79,7 +79,6 @@ class AssetsController extends Controller
 
             $assets = $this->getWorkspaceAssetsQuery()
                 ->where('assigned_to', auth()->id())
-                ->orWhere('assigned_to', auth()->id())
                 ->get();
         }
 
@@ -104,8 +103,6 @@ class AssetsController extends Controller
 
             return view('assets::assets.show', compact('asset', 'users'));
         } catch (\Exception $e) {
-            // dd($e);
-
             return response()->json([
                 'error' => true,
                 'message' => config('app.debug') ? $e->getMessage() : 'An error occured'
@@ -246,8 +243,6 @@ class AssetsController extends Controller
                 ]);
 
                 // Update asset status
-
-                // dd($asset->admin_id);
                 $asset->update([
                     'status' => 'available',
                     'assigned_to' => null
@@ -727,7 +722,7 @@ class AssetsController extends Controller
 
         $assets = Asset::where('admin_id', $adminId)->get();
 
-        // Get all assets and count status in PHP
+        // Get all assets and count status
         $statusCounts = $assets
             ->groupBy('status')
             ->map(fn($items) => $items->count());

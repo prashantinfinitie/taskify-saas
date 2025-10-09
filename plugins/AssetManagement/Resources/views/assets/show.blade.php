@@ -84,6 +84,7 @@
                                 </div>
                             </div>
                         </div>
+                         @if(isAdminOrHasAllDataAccess())
                         <div class="col-6">
                             <div class="d-flex align-items-center">
                                 <div class="avatar me-3">
@@ -91,12 +92,14 @@
                                         <i class="bx bx-calendar icon-lg"></i>
                                     </div>
                                 </div>
+
                                 <div class="flex-grow-1">
                                     <h6 class="mb-0">{{ $asset->histories->count() }}</h6>
                                     <small class="text-muted">{{ get_label('history_records', 'History Records') }}</small>
                                 </div>
                             </div>
                         </div>
+                        @endif
                     </div>
 
                     <div class="info-container">
