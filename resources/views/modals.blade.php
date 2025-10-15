@@ -27,7 +27,7 @@
                     <div class="modal fade" id="create_status_modal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <form class="modal-content form-submit-event" action="{{ route('status.store') }}" method="POST">
-                                <input type="hidden" name="dnr">
+                                <input type="hidden" name="dnr" value="1">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel1">
                                         <?= get_label('create_status', 'Create status') ?>
@@ -3261,9 +3261,7 @@
                     <div class="modal fade" id="create_priority_modal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <form class="modal-content form-submit-event" action="{{ route('priority.store') }}" method="POST">
-                                @if (Request::is('priority/manage'))
-                                    <input type="hidden" name="dnr">
-                                @endif
+                                     <input type="hidden" name="dnr" value="1">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel1">
                                         <?= get_label('create_priority', 'Create Priority') ?>
@@ -3481,7 +3479,6 @@
                                             <div class="input-group">
                                                 <select class="form-select priorityDropdown" name="priority_id"
                                                     data-placeholder="<?= get_label('please_select', 'Please select') ?>">
-                                                    <option></option>
                                                     @isset($priorities)
                                                         @foreach ($priorities as $priority)
                                                             <option value="{{ $priority->id }}" data-color="{{ $priority->color }}">
@@ -4217,7 +4214,6 @@
                                             <div class="input-group">
                                                 <select class="form-select priorityDropdown" name="priority_id"
                                                     data-placeholder="<?= get_label('please_select', 'Please select') ?>">
-                                                    <option></option>
                                                     @isset($priorities)
                                                         @foreach ($priorities as $priority)
                                                             <option value="{{ $priority->id }}" data-color="{{ $priority->color }}">

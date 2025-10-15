@@ -142,8 +142,13 @@ public function __construct()
         $payslip = Payslip::create($formFields);
 
         if ($payslip) {
-            $payslip->allowances()->attach($allowance_ids);
-            $payslip->deductions()->attach($deduction_ids);
+                $payslip->allowances()->attach(
+
+                    collect($allowance_ids)->mapWithKeys(fn($id) => [$id => ['admin_id' => $adminId]])
+                );
+                $payslip->deductions()->attach(
+                    collect($deduction_ids)->mapWithKeys(fn($id) => [$id => ['admin_id' => $adminId]])
+                );
 
             Session::flash('message', 'Payslip created successfully.');
 

@@ -104,7 +104,7 @@ Route::get('/clear-cache', function () {
 });
 Route::get('/migrate', function () {
     Artisan::call('migrate', [
-        '--path' => 'plugins/AssetManagement/Database/Migrations/2025_07_08_073859_create_assets_table.php'
+        '--path' => 'database/migrations/2025_10_11_999999_add_cascade_to_workspace_relations.php'
     ]);
 
     return redirect()->back()->with('message', 'Migrate successfully.');

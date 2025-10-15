@@ -60,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+
+
+
+
+
     public function scopeFilter($query, array $filters)
     {
         if ($filters['search'] ?? false) {
@@ -270,7 +275,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(LeadForm::class);
     }
-    
+
     public function scheduledEmails()
     {
         return $this->hasMany(ScheduledEmail::class, 'user_id')->where('workspace_id', getWorkspaceId());

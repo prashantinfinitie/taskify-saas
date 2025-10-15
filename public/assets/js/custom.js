@@ -1072,6 +1072,7 @@ $(document).on("submit", ".form-submit-event", function (e) {
         btn_html != "" || btn_html != "undefined" ? btn_html : btn_val;
     var tableInput = currentForm.find('input[name="table"]');
     var tableID = tableInput.length ? tableInput.val() : "table";
+
     $.ajax({
         type: "POST",
         url: $(this).attr("action"),
@@ -1093,7 +1094,213 @@ $(document).on("submit", ".form-submit-event", function (e) {
             if (result["error"] == true) {
                 toastr.error(result["message"]);
             } else {
-                if ($(".empty-state").length > 0) {
+                if (currentForm.find('input[name="dnr"]').length > 0) {
+
+                    var modalWithClass = $(".modal.fade.show");
+                    var offcanvasWithClass = $(".offcanvas.show");
+                    if (modalWithClass.length > 0 || offcanvasWithClass.length > 0) {
+                        var idOfModal = modalWithClass.attr("id");
+                        var idOfOffcanvas = offcanvasWithClass.attr("id");
+                        $("#" + idOfModal).modal("hide");
+                        $("#" + tableID).bootstrapTable("refresh");
+                        currentForm[0].reset();
+                        var partialLeaveCheckbox = $("#partialLeave");
+                        if (partialLeaveCheckbox.length) {
+                            partialLeaveCheckbox.trigger("change");
+                        }
+                        resetDateFields(currentForm);
+
+                        // Handle specific offcanvas scenarios
+                        if (idOfModal == "create_status_modal" || idOfModal == "edit_status_modal") {
+                            var dropdownSelector = offcanvasWithClass.find('select[name="status_id"]');
+                            console.log(result);
+                            if (dropdownSelector.length && result.status) {
+                                var newItem = result.status;
+
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("data-color", newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title + " (" + newItem.color + ")");
+                                console.log(newOption);
+                                $(dropdownSelector).append(newOption);
+
+                                // Update other forms with new status option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="status_id"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("data-color", newItem.color)
+                                                .text(newItem.title + " (" + newItem.color + ")");
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (idOfModal == "create_priority_modal" || idOfModal == "edit_priority_modal") {
+
+                            var dropdownSelector = offcanvasWithClass.find('select[name="priority_id"]');
+                            console.log(result);
+                            if (dropdownSelector.length && result.data) {
+                                var newItem = result.data;
+                                console.log(newItem);
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("data-color", newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title + " (" + newItem.color + ")");
+                                console.log(newOption);
+                                $(dropdownSelector).append(newOption);
+
+                                // Update other forms with new priority option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas", "#create_task_offcanvas", "#edit_task_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="priority_id"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("data-color", newItem.color)
+                                                .text(newItem.title + " (" + newItem.color + ")");
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (idOfModal == "create_tag_modal" || idOfModal == "edit_tag_modal") {
+                            var dropdownSelector = offcanvasWithClass.find('select[name="tag_ids[]"]');
+                            console.log(result);
+                            if (dropdownSelector.length && result.tag) {
+                                var newItem = result.tag;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("data-color", newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+
+                                // Update other forms with new tag option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="tag_ids[]"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("data-color", newItem.color)
+                                                .text(newItem.title);
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (idOfModal == "create_item_modal") {
+                            var dropdownSelector = $("#item_id");
+                            if (dropdownSelector.length) {
+                                var newItem = result.item;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+                            }
+                        }
+                        if (idOfModal === "create_contract_type_modal") {
+                            var dropdownSelector = modalWithClass.find(
+                                'select[name="contract_type_id"]'
+                            );
+                            if (dropdownSelector.length) {
+                                var newItem = result.ct;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("selected", true)
+                                    .text(newItem.type);
+                                // Append and select the new option in the current modal
+                                dropdownSelector.append(newOption);
+                                var openModalId = dropdownSelector
+                                    .closest(".modal.fade.show")
+                                    .attr("id");
+                                var otherModalId =
+                                    openModalId === "create_contract_modal"
+                                        ? "#edit_contract_modal"
+                                        : "#create_contract_modal";
+                                var otherModalSelector = $(
+                                    otherModalId
+                                ).find('select[name="contract_type_id"]');
+                                // Create a new option for the other modal without 'selected' attribute
+                                var otherOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .text(newItem.type);
+                                // Append the option to the other modal
+                                otherModalSelector.append(otherOption);
+                            }
+                        }
+                        if (idOfModal == "create_pm_modal") {
+                            var dropdownSelector = $(
+                                'select[name="payment_method_id"]'
+                            );
+                            if (dropdownSelector.length) {
+                                var newItem = result.pm;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+                            }
+                        }
+                        if (idOfModal == "create_allowance_modal") {
+                            var dropdownSelector = $(
+                                'select[name="allowance_id"]'
+                            );
+                            if (dropdownSelector.length) {
+                                var newItem = result.allowance;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+                            }
+                        }
+                        if (idOfModal == "create_deduction_modal") {
+                            var dropdownSelector = $(
+                                'select[name="deduction_id"]'
+                            );
+                            if (dropdownSelector.length) {
+                                var newItem = result.deduction;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+                            }
+                        }
+                    }
+                    toastr.success(result["message"]);
+
+                } else if ($(".empty-state").length > 0) {
                     if (result.hasOwnProperty("message")) {
                         toastr.success(result["message"]);
                         // Show toastr for 3 seconds before reloading or redirecting
@@ -1101,275 +1308,9 @@ $(document).on("submit", ".form-submit-event", function (e) {
                     } else {
                         handleRedirection();
                     }
+
                 } else {
-                    if (currentForm.find('input[name="dnr"]').length > 0) {
-                        var modalWithClass = $(".modal.fade.show");
-                        if (modalWithClass.length > 0) {
-                            var idOfModal = modalWithClass.attr("id");
-                            $("#" + idOfModal).modal("hide");
-                            $("#" + tableID).bootstrapTable("refresh");
-                            currentForm[0].reset();
-                            var partialLeaveCheckbox = $("#partialLeave");
-                            if (partialLeaveCheckbox.length) {
-                                partialLeaveCheckbox.trigger("change");
-                            }
-                            resetDateFields(currentForm);
-                            if (idOfModal == "create_status_modal") {
-                                var dropdownSelector = modalWithClass.find(
-                                    'select[name="status_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.status;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("data-color", newItem.color)
-                                        .attr("selected", true)
-                                        .text(
-                                            newItem.title +
-                                            " (" +
-                                            newItem.color +
-                                            ")"
-                                        );
-                                    $(dropdownSelector).append(newOption);
-                                    var openModalId = dropdownSelector
-                                        .closest(".modal.fade.show")
-                                        .attr("id");
-                                    // List of all possible modal IDs
-                                    var modalIds = [
-                                        "#create_project_modal",
-                                        "#edit_project_modal",
-                                        "#create_task_modal",
-                                        "#edit_task_modal",
-                                    ];
-                                    // Iterate through each modal ID
-                                    modalIds.forEach(function (modalId) {
-                                        // If the modal ID is not the open one
-                                        if (modalId !== "#" + openModalId) {
-                                            // Find the select element within the modal
-                                            var otherModalSelector = $(
-                                                modalId
-                                            ).find('select[name="status_id"]');
-                                            // Create a new option without 'selected' attribute
-                                            var otherOption = $(
-                                                "<option></option>"
-                                            )
-                                                .attr("value", newItem.id)
-                                                .attr(
-                                                    "data-color",
-                                                    newItem.color
-                                                )
-                                                .text(
-                                                    newItem.title +
-                                                    " (" +
-                                                    newItem.color +
-                                                    ")"
-                                                );
-                                            // Append the option to the select element in the modal
-                                            otherModalSelector.append(
-                                                otherOption
-                                            );
-                                        }
-                                    });
-                                }
-                            }
-                            if (idOfModal == "create_priority_modal") {
-                                var dropdownSelector = modalWithClass.find(
-                                    'select[name="priority_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.priority;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr(
-                                            "class",
-                                            "badge bg-label-" + newItem.color
-                                        )
-                                        .attr("selected", true)
-                                        .text(
-                                            newItem.title +
-                                            " (" +
-                                            newItem.color +
-                                            ")"
-                                        );
-                                    $(dropdownSelector).append(newOption);
-                                    var openModalId = dropdownSelector
-                                        .closest(".modal.fade.show")
-                                        .attr("id");
-                                    // List of all possible modal IDs
-                                    var modalIds = [
-                                        "#create_project_modal",
-                                        "#edit_project_modal",
-                                        "#create_task_modal",
-                                        "#edit_task_modal",
-                                    ];
-                                    // Iterate through each modal ID
-                                    modalIds.forEach(function (modalId) {
-                                        // If the modal ID is not the open one
-                                        if (modalId !== "#" + openModalId) {
-                                            // Find the select element within the modal
-                                            var otherModalSelector = $(
-                                                modalId
-                                            ).find(
-                                                'select[name="priority_id"]'
-                                            );
-                                            // Create a new option without 'selected' attribute
-                                            var otherOption = $(
-                                                "<option></option>"
-                                            )
-                                                .attr("value", newItem.id)
-                                                .attr(
-                                                    "class",
-                                                    "badge bg-label-" +
-                                                    newItem.color
-                                                )
-                                                .text(
-                                                    newItem.title +
-                                                    " (" +
-                                                    newItem.color +
-                                                    ")"
-                                                );
-                                            // Append the option to the select element in the modal
-                                            otherModalSelector.append(
-                                                otherOption
-                                            );
-                                        }
-                                    });
-                                }
-                            }
-                            if (idOfModal == "create_tag_modal") {
-                                var dropdownSelector = modalWithClass.find(
-                                    'select[name="tag_ids[]"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.tag;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("data-color", newItem.color)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-                                    var openModalId = dropdownSelector
-                                        .closest(".modal.fade.show")
-                                        .attr("id");
-                                    // List of all possible modal IDs
-                                    var modalIds = [
-                                        "#create_project_modal",
-                                        "#edit_project_modal",
-                                    ];
-                                    // Iterate through each modal ID
-                                    modalIds.forEach(function (modalId) {
-                                        // If the modal ID is not the open one
-                                        if (modalId !== "#" + openModalId) {
-                                            // Find the select element within the modal
-                                            var otherModalSelector = $(
-                                                modalId
-                                            ).find('select[name="tag_ids[]"]');
-                                            // Create a new option without 'selected' attribute
-                                            var otherOption = $(
-                                                "<option></option>"
-                                            )
-                                                .attr("value", newItem.id)
-                                                .attr(
-                                                    "data-color",
-                                                    newItem.color
-                                                )
-                                                .text(newItem.title);
-                                            // Append the option to the select element in the modal
-                                            otherModalSelector.append(
-                                                otherOption
-                                            );
-                                        }
-                                    });
-                                }
-                            }
-                            if (idOfModal == "create_item_modal") {
-                                var dropdownSelector = $("#item_id");
-                                if (dropdownSelector.length) {
-                                    var newItem = result.item;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-                                }
-                            }
-                            if (idOfModal === "create_contract_type_modal") {
-                                var dropdownSelector = modalWithClass.find(
-                                    'select[name="contract_type_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.ct;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("selected", true)
-                                        .text(newItem.type);
-                                    // Append and select the new option in the current modal
-                                    dropdownSelector.append(newOption);
-                                    var openModalId = dropdownSelector
-                                        .closest(".modal.fade.show")
-                                        .attr("id");
-                                    var otherModalId =
-                                        openModalId === "create_contract_modal"
-                                            ? "#edit_contract_modal"
-                                            : "#create_contract_modal";
-                                    var otherModalSelector = $(
-                                        otherModalId
-                                    ).find('select[name="contract_type_id"]');
-                                    // Create a new option for the other modal without 'selected' attribute
-                                    var otherOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .text(newItem.type);
-                                    // Append the option to the other modal
-                                    otherModalSelector.append(otherOption);
-                                }
-                            }
-                            if (idOfModal == "create_pm_modal") {
-                                var dropdownSelector = $(
-                                    'select[name="payment_method_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.pm;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-                                }
-                            }
-                            if (idOfModal == "create_allowance_modal") {
-                                var dropdownSelector = $(
-                                    'select[name="allowance_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.allowance;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-                                }
-                            }
-                            if (idOfModal == "create_deduction_modal") {
-                                var dropdownSelector = $(
-                                    'select[name="deduction_id"]'
-                                );
-                                if (dropdownSelector.length) {
-                                    var newItem = result.deduction;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-                                }
-                            }
-                        }
-                        toastr.success(result["message"]);
-                    } else {
+
                         if (result.hasOwnProperty("message")) {
                             toastr.success(result["message"]);
                             // Show toastr for 3 seconds before reloading or redirecting
@@ -1377,7 +1318,7 @@ $(document).on("submit", ".form-submit-event", function (e) {
                         } else {
                             handleRedirection();
                         }
-                    }
+
                 }
             }
         },
@@ -1524,7 +1465,123 @@ $(document).on("submit", ".new-form-submit-event", function (e) {
             if (result["error"] == true) {
                 toastr.error(result["message"]);
             } else {
-                if ($(".empty-state").length > 0) {
+
+                if (currentForm.find('input[name="dnr"]').length > 0) {
+
+                    var offcanvasWithClass = $(".offcanvas.show");
+
+                    if (offcanvasWithClass.length > 0) {
+                        var idOfOffcanvas = offcanvasWithClass.attr("id");
+                        var offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasWithClass[0]);
+                        if (offcanvasInstance) {
+                            offcanvasInstance.hide();
+                        }
+                        $("#" + tableID).bootstrapTable("refresh");
+                        currentForm[0].reset();
+                        var partialLeaveCheckbox = $("#partialLeave");
+                        if (partialLeaveCheckbox.length) {
+                            partialLeaveCheckbox.trigger("change");
+                        }
+                        resetDateFields(currentForm);
+
+                        // Handle specific offcanvas scenarios
+                        if (idOfOffcanvas == "create_status_modal" || idOfOffcanvas == "edit_status_modal") {
+                            var dropdownSelector = offcanvasWithClass.find('select[name="status_id"]');
+                            if (dropdownSelector.length && result.status) {
+                                var newItem = result.status;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("data-color", newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title + " (" + newItem.color + ")");
+                                $(dropdownSelector).append(newOption);
+
+                                // Update other forms with new status option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="status_id"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("data-color", newItem.color)
+                                                .text(newItem.title + " (" + newItem.color + ")");
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (idOfOffcanvas == "create_priority_modal" || idOfOffcanvas == "edit_priority_modal") {
+                            var dropdownSelector = offcanvasWithClass.find('select[name="priority_id"]');
+                            if (dropdownSelector.length && result.priority) {
+                                var newItem = result.priority;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("class", "badge bg-label-" + newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title + " (" + newItem.color + ")");
+                                $(dropdownSelector).append(newOption);
+
+                                // Update other forms with new priority option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas", "#create_task_offcanvas", "#edit_task_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="priority_id"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("class", "badge bg-label-" + newItem.color)
+                                                .text(newItem.title + " (" + newItem.color + ")");
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (idOfOffcanvas == "create_tag_modal" || idOfOffcanvas == "edit_tag_modal") {
+                            var dropdownSelector = offcanvasWithClass.find('select[name="tag_ids[]"]');
+                            if (dropdownSelector.length && result.tag) {
+                                var newItem = result.tag;
+                                var newOption = $("<option></option>")
+                                    .attr("value", newItem.id)
+                                    .attr("data-color", newItem.color)
+                                    .attr("selected", true)
+                                    .text(newItem.title);
+                                $(dropdownSelector).append(newOption);
+                                $(dropdownSelector).trigger("change");
+
+                                // Update other forms with new tag option
+                                var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
+                                var otherModalIds = ["#create_project_modal", "#edit_project_modal"];
+                                var allIds = otherOffcanvasIds.concat(otherModalIds);
+
+                                allIds.forEach(function (elementId) {
+                                    if (elementId !== "#" + idOfOffcanvas) {
+                                        var otherSelector = $(elementId).find('select[name="tag_ids[]"]');
+                                        if (otherSelector.length) {
+                                            var otherOption = $("<option></option>")
+                                                .attr("value", newItem.id)
+                                                .attr("data-color", newItem.color)
+                                                .text(newItem.title);
+                                            otherSelector.append(otherOption);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    toastr.success(result["message"]);
+                }
+                else if ($(".empty-state").length > 0) {
                     if (result.hasOwnProperty("message")) {
                         toastr.success(result["message"]);
                         setTimeout(handleRedirection, 3000);
@@ -1532,127 +1589,13 @@ $(document).on("submit", ".new-form-submit-event", function (e) {
                         handleRedirection();
                     }
                 } else {
-                    if (currentForm.find('input[name="dnr"]').length > 0) {
-                        var offcanvasWithClass = $(".offcanvas.show");
 
-                        if (offcanvasWithClass.length > 0) {
-                            var idOfOffcanvas = offcanvasWithClass.attr("id");
-                            var offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasWithClass[0]);
-                            if (offcanvasInstance) {
-                                offcanvasInstance.hide();
-                            }
-                            $("#" + tableID).bootstrapTable("refresh");
-                            currentForm[0].reset();
-                            var partialLeaveCheckbox = $("#partialLeave");
-                            if (partialLeaveCheckbox.length) {
-                                partialLeaveCheckbox.trigger("change");
-                            }
-                            resetDateFields(currentForm);
-
-                            // Handle specific offcanvas scenarios
-                            if (idOfOffcanvas == "create_status_modal" || idOfOffcanvas == "edit_status_modal") {
-                                var dropdownSelector = offcanvasWithClass.find('select[name="status_id"]');
-                                if (dropdownSelector.length && result.status) {
-                                    var newItem = result.status;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("data-color", newItem.color)
-                                        .attr("selected", true)
-                                        .text(newItem.title + " (" + newItem.color + ")");
-                                    $(dropdownSelector).append(newOption);
-
-                                    // Update other forms with new status option
-                                    var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
-                                    var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
-                                    var allIds = otherOffcanvasIds.concat(otherModalIds);
-
-                                    allIds.forEach(function (elementId) {
-                                        if (elementId !== "#" + idOfOffcanvas) {
-                                            var otherSelector = $(elementId).find('select[name="status_id"]');
-                                            if (otherSelector.length) {
-                                                var otherOption = $("<option></option>")
-                                                    .attr("value", newItem.id)
-                                                    .attr("data-color", newItem.color)
-                                                    .text(newItem.title + " (" + newItem.color + ")");
-                                                otherSelector.append(otherOption);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            if (idOfOffcanvas == "create_priority_modal" || idOfOffcanvas == "edit_priority_modal") {
-                                var dropdownSelector = offcanvasWithClass.find('select[name="priority_id"]');
-                                if (dropdownSelector.length && result.priority) {
-                                    var newItem = result.priority;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("class", "badge bg-label-" + newItem.color)
-                                        .attr("selected", true)
-                                        .text(newItem.title + " (" + newItem.color + ")");
-                                    $(dropdownSelector).append(newOption);
-
-                                    // Update other forms with new priority option
-                                    var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas", "#create_task_offcanvas", "#edit_task_offcanvas"];
-                                    var otherModalIds = ["#create_project_modal", "#edit_project_modal", "#create_task_modal", "#edit_task_modal"];
-                                    var allIds = otherOffcanvasIds.concat(otherModalIds);
-
-                                    allIds.forEach(function (elementId) {
-                                        if (elementId !== "#" + idOfOffcanvas) {
-                                            var otherSelector = $(elementId).find('select[name="priority_id"]');
-                                            if (otherSelector.length) {
-                                                var otherOption = $("<option></option>")
-                                                    .attr("value", newItem.id)
-                                                    .attr("class", "badge bg-label-" + newItem.color)
-                                                    .text(newItem.title + " (" + newItem.color + ")");
-                                                otherSelector.append(otherOption);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            if (idOfOffcanvas == "create_tag_modal" || idOfOffcanvas == "edit_tag_modal") {
-                                var dropdownSelector = offcanvasWithClass.find('select[name="tag_ids[]"]');
-                                if (dropdownSelector.length && result.tag) {
-                                    var newItem = result.tag;
-                                    var newOption = $("<option></option>")
-                                        .attr("value", newItem.id)
-                                        .attr("data-color", newItem.color)
-                                        .attr("selected", true)
-                                        .text(newItem.title);
-                                    $(dropdownSelector).append(newOption);
-                                    $(dropdownSelector).trigger("change");
-
-                                    // Update other forms with new tag option
-                                    var otherOffcanvasIds = ["#create_project_offcanvas", "#edit_project_offcanvas"];
-                                    var otherModalIds = ["#create_project_modal", "#edit_project_modal"];
-                                    var allIds = otherOffcanvasIds.concat(otherModalIds);
-
-                                    allIds.forEach(function (elementId) {
-                                        if (elementId !== "#" + idOfOffcanvas) {
-                                            var otherSelector = $(elementId).find('select[name="tag_ids[]"]');
-                                            if (otherSelector.length) {
-                                                var otherOption = $("<option></option>")
-                                                    .attr("value", newItem.id)
-                                                    .attr("data-color", newItem.color)
-                                                    .text(newItem.title);
-                                                otherSelector.append(otherOption);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                        toastr.success(result["message"]);
-                    } else {
                         if (result.hasOwnProperty("message")) {
                             toastr.success(result["message"]);
                             setTimeout(handleRedirection, 3000);
                         } else {
                             handleRedirection();
                         }
-                    }
                 }
             }
         },

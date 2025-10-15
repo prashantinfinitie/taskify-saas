@@ -182,7 +182,7 @@ public function __construct()
             })->get();
         $tags = Tag::where('admin_id', $adminId)
             ->get();
-         $customFields = CustomField::all();    
+        $customFields = CustomField::all();
 
         return view('projects.create_project', ['users' => $users, 'clients' => $clients, 'auth_user' => $this->user, 'statuses' => $statuses, 'tags' => $tags, 'customFields' => $customFields]);
     }
@@ -365,9 +365,19 @@ public function store(Request $request)
         }
 
         $project = Project::find($new_project->id);
-        $project->users()->attach($userIds);
-        $project->clients()->attach($clientIds);
-        $project->tags()->attach($tagIds);
+            $project->users()->attach(
+                collect($userIds)->mapWithKeys(fn($userId) => [
+                    $userId => ['admin_id' => $adminId],
+                ])->toArray()
+            );
+
+            $project->clients()->attach($clientIds);
+
+            $project->tags()->attach(
+                collect($tagIds)->mapWithKeys(fn($tagId) => [
+                    $tagId => ['admin_id' => $adminId]
+                ])
+            );
 
         $project->statusTimelines()->create([
             'status' => $status->title,
@@ -663,7 +673,7 @@ public function update(Request $request)
                 }
             }
         }
-        
+
         // Prepare notification data
         $notificationData = [
             'type' => 'project',
@@ -1028,8 +1038,8 @@ else {
                         $customFieldValue = $project->customFieldValues()
                             ->where('custom_field_id', $customField->id)
                             ->value('value');
-                    
-                        if ($customField->field_type === 'date' && $customFieldValue) {
+
+                    if ($customField->field_type === 'date' && $customFieldValue) {
                             try {
                                 $customFieldValue = \Carbon\Carbon::parse($customFieldValue);
                                 $customFieldValue = format_date($customFieldValue, false);
@@ -1037,13 +1047,13 @@ else {
                                 $customFieldValue = '-';
                             }
                         }
-                    
-                        $row['custom_field_' . $customField->id] = $customFieldValue ?? '-';
-                    }
-                    
-                    
 
-                    return $row;
+                    $row['custom_field_' . $customField->id] = $customFieldValue ?? '-';
+                    }
+
+
+
+                return $row;
                 }
             );
 
@@ -1248,17 +1258,16 @@ public function apiList(Request $request, $id = null)
                 ->paginate($per_page);
 
             $formattedProjects = $projects->map(fn($project) => formatProject($project));
-            
-            return formatApiResponse(
+
+                return formatApiResponse(
                 false,
                 'Projects retrieved successfully.',
                 [
                     'total' => $total,
                     'data' => $formattedProjects
                 ]
-            );
-            
-        }
+                );
+            }
     } catch (ValidationException $e) {
             return formatApiValidationError($isApi, $e->errors());
         } catch (Exception $e) {
@@ -3211,22 +3220,22 @@ public function comments(Request $request)
 public function get_calendar_data(Request $request)
 {
     $php_date_format = app('php_date_format');
-    
-    // Get date range from request
-    $start = $request->query('date_from')
+
+        // Get date range from request
+        $start = $request->query('date_from')
         ? Carbon::createFromFormat('Y-m-d', $request->query('date_from'), config('app.timezone'))
         : Carbon::now(config('app.timezone'))->startOfMonth();
-        
-    $end = $request->query('date_to')
+
+        $end = $request->query('date_to')
         ? Carbon::createFromFormat('Y-m-d', $request->query('date_to'), config('app.timezone'))
         : Carbon::now(config('app.timezone'))->endOfMonth();
 
-    // Get custom date filters if provided (these take precedence)
-    $customStart = $request->query('custom_date_from') 
+        // Get custom date filters if provided (these take precedence)
+        $customStart = $request->query('custom_date_from')
         ? Carbon::createFromFormat('Y-m-d', $request->query('custom_date_from'), config('app.timezone'))
         : null;
-        
-    $customEnd = $request->query('custom_date_to')
+
+        $customEnd = $request->query('custom_date_to')
         ? Carbon::createFromFormat('Y-m-d', $request->query('custom_date_to'), config('app.timezone'))
         : null;
 
@@ -3237,18 +3246,18 @@ public function get_calendar_data(Request $request)
     // Get filter parameters
     $statusIds = $request->query('status_ids', []);
     $priorityIds = $request->query('priority_ids', []);
-    
-    // Convert comma-separated string to array if needed
-    if (is_string($statusIds)) {
+
+        // Convert comma-separated string to array if needed
+        if (is_string($statusIds)) {
         $statusIds = explode(',', $statusIds);
     }
     if (is_string($priorityIds)) {
         $priorityIds = explode(',', $priorityIds);
     }
 
-    // Base query
-    $projectsQuery = isAdminOrHasAllDataAccess() 
-        ? $this->workspace->projects() 
+        // Base query
+        $projectsQuery = isAdminOrHasAllDataAccess()
+            ? $this->workspace->projects()
         : $this->user->projects();
 
     // Apply date range filter
@@ -3280,9 +3289,9 @@ public function get_calendar_data(Request $request)
     // Format projects for FullCalendar
     $events = $projects->map(function ($project) {
         $backgroundColor = '#007bff';
-        
-        // Set background color based on project status
-        switch ($project->status->color) {
+
+            // Set background color based on project status
+            switch ($project->status->color) {
             case 'primary':
                 $backgroundColor = '#9bafff';
                 break;
@@ -3313,22 +3322,22 @@ public function get_calendar_data(Request $request)
 
         // Create title with date information
         $title = $project->title;
-        
-        // Add status and priority info to title for better context
-        $statusInfo = ' [' . $project->status->title . ']';
+
+            // Add status and priority info to title for better context
+            $statusInfo = ' [' . $project->status->title . ']';
         if ($project->priority) {
             $statusInfo .= ' (' . $project->priority->title . ')';
         }
-        
-        // Format dates for display
-        $startDateFormatted = format_date($project->start_date);
+
+            // Format dates for display
+            $startDateFormatted = format_date($project->start_date);
         if ($project->end_date != $project->start_date) {
             $title .= ' : ' . $startDateFormatted . ' ' . get_label('to', 'to') . ' ' . format_date($project->end_date);
         } else {
             $title .= ' : ' . $startDateFormatted;
         }
-        
-        $title .= $statusInfo;
+
+            $title .= $statusInfo;
 
         return [
             'id' => $project->id,

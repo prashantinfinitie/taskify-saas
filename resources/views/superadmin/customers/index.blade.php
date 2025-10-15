@@ -37,6 +37,9 @@
                     <input type="hidden" id="data_type" value="customers">
                 </div>
                 <div class="card-body">
+                       <div class="alert alert-warning mt-3" role="alert">
+                    {{ get_label('delete_alert', 'If You Delete Customer all related data like workspace,project.tasks etc also will be deleted') }}
+                    </div>
                     <div class="table-responsive text-nowrap">
 
                         <table id="table" data-toggle="table" data-loading-template="loadingTemplate"

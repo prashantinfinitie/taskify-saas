@@ -10,11 +10,10 @@ class CreateDeductionPayslipTable extends Migration
         Schema::create('deduction_payslip', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('deduction_id');
-            $table->unsignedBigInteger('payslip_id');            
+            $table->unsignedBigInteger('payslip_id');
             $table->timestamps();
 
             // Define foreign keys
-            $table->foreign('deduction_id')->references('id')->on('deductions')->onDelete('cascade');
             $table->foreign('payslip_id')->references('id')->on('payslips')->onDelete('cascade');
         });
     }

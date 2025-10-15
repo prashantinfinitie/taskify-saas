@@ -45,7 +45,7 @@
                     <i class='bx bxs-grid-alt'></i>
                 </button>
             </a>
-            <a href="{{ route('projects.kanban_view', ['status' => request()->status, 'sort' => request()->sort]) }}"><button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-original-title="<?= get_label('kanban_view', 'Kanban View') ?>"><i class='bx bxs-dashboard'></i></button></a>
+            <a href="{{ route('projects.kanban_view', ['status' => request()->status, 'sort' => request()->sort]) }}"><button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-original-title="<?= get_label('kanban_view', 'Kanban View') ?>"><i class='bx bxs-layout'></i></button></a>
             <a href="{{ route('projects.gantt_chart') }}"><button type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-original-title="<?= get_label('gantt_chart_view', 'Gantt Chart View') ?>"><i class='bx bxs-collection'></i></button></a>
             <a href="{{ route('projects.calendar_view') }}"><button type="button" class="btn btn-sm btn-primary"
                             data-bs-toggle="tooltip" data-bs-placement="left"

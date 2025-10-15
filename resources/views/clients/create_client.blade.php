@@ -111,13 +111,13 @@
                                 <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
                             </div>
                         </div>
-                        <div class="col-md-6 d-none mb-3">
+                        <div class="col-md-6  mb-3">
                             <label for="dob" class="form-label"><?= get_label('dob', 'Date of birth') ?>
                                 <span class="asterisk">*</span></label>
                             <input class="form-control" type="text" id="dob" name="dob"
                                 placeholder="<?= get_label('please_select', 'Please select') ?>" autocomplete="off">
                         </div>
-                        <div class="col-md-6 d-none mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="doj" class="form-label"><?= get_label('doj', 'Date of joining') ?>
                                 <span class="asterisk">*</span></label>
                             <input class="form-control" type="text" id="doj" name="doj"

@@ -39,6 +39,8 @@ class ContractsController extends Controller
         $users = $this->workspace->users;
         $clients = $this->workspace->clients;
         $projects = isAdminOrHasAllDataAccess() ? $this->workspace->projects : $this->user->projects;
+
+        // dd($projects);
         $contract_types = $this->workspace->contract_types;
         return view('contracts.list', ['contracts' => $contracts, 'users' => $users, 'clients' => $clients, 'projects' => $projects, 'contract_types' => $contract_types]);
     }

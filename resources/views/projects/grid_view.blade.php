@@ -66,7 +66,7 @@
                 <a href="{{ route('projects.kanban_view', ['status' => request()->status, 'sort' => request()->sort]) }}"><button
                         type="button" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-bs-placement="left"
                         data-bs-original-title="<?= get_label('kanban_view', 'Kanban View') ?>"><i
-                            class='bx bxs-dashboard'></i></button></a>
+                            class='bx bxs-layout'></i></button></a>
                 <a href="{{ route('projects.gantt_chart') }}"><button type="button" class="btn btn-sm btn-primary"
                         data-bs-toggle="tooltip" data-bs-placement="left"
                         data-bs-original-title="<?= get_label('gantt_chart_view', 'Gantt Chart View') ?>"><i
@@ -408,11 +408,11 @@
                                         @php
                                             $endDate = Carbon\Carbon::parse($project->end_date);
                                             $currentDate = Carbon\Carbon::now();
-                                                                            
+
                                             $daysDifference = (int) round($currentDate->diffInDays($endDate, false));
                                             $isOverdue = $daysDifference < 0;
                                         @endphp
-                                                                            
+
                                         <div class="col-md-4 text-end">
                                             <span>
                                                 <i class="bx bx-calendar-event text-{{ $isOverdue ? 'warning' : 'primary' }}"></i>

@@ -148,8 +148,10 @@ public function store(Request $request)
             session()->put('workspace_id', $workspace_id);
         }
         $workspace = Workspace::find($workspace_id);
-        // Attach users and clients to the workspace
-        $workspace->users()->attach($userIds, ['admin_id' => $adminId]);
+            // Attach users and clients to the workspace
+            $workspace->users()->attach(
+                collect($userIds)->mapWithKeys(fn($id) => [$id => ['admin_id' => $adminId]])
+            );
         $workspace->clients()->attach($clientIds, ['admin_id' => $adminId]);
 
         //Create activity log

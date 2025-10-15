@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
 
-            // Define foreign key constraints            
+            // Define foreign key constraints
             $table->foreign('workspace_id')->references('id')->on('workspaces')->onDelete('cascade');
         });
     }
