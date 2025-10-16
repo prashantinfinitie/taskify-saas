@@ -1094,7 +1094,16 @@ $(document).on("submit", ".form-submit-event", function (e) {
             if (result["error"] == true) {
                 toastr.error(result["message"]);
             } else {
-                if (currentForm.find('input[name="dnr"]').length > 0) {
+                if ($(".empty-state").length > 0) {
+                    if (result.hasOwnProperty("message")) {
+                        toastr.success(result["message"]);
+                        // Show toastr for 3 seconds before reloading or redirecting
+                        setTimeout(handleRedirection, 3000);
+                    } else {
+                        handleRedirection();
+                    }
+
+                } else if (currentForm.find('input[name="dnr"]').length > 0) {
 
                     var modalWithClass = $(".modal.fade.show");
                     var offcanvasWithClass = $(".offcanvas.show");
@@ -1300,7 +1309,8 @@ $(document).on("submit", ".form-submit-event", function (e) {
                     }
                     toastr.success(result["message"]);
 
-                } else if ($(".empty-state").length > 0) {
+                } else {
+
                     if (result.hasOwnProperty("message")) {
                         toastr.success(result["message"]);
                         // Show toastr for 3 seconds before reloading or redirecting
@@ -1308,16 +1318,6 @@ $(document).on("submit", ".form-submit-event", function (e) {
                     } else {
                         handleRedirection();
                     }
-
-                } else {
-
-                        if (result.hasOwnProperty("message")) {
-                            toastr.success(result["message"]);
-                            // Show toastr for 3 seconds before reloading or redirecting
-                            setTimeout(handleRedirection, 3000);
-                        } else {
-                            handleRedirection();
-                        }
 
                 }
             }

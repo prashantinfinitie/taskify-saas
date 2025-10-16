@@ -111,7 +111,8 @@ class SearchController extends Controller
                 foreach ($users as $user) {
                     $results['users'][] = [
                         'id' => $user->id,
-                        'title' => $user->first_name . ' ' . $user->last_name
+                        'title' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email
                     ];
                 }
             }
@@ -128,7 +129,8 @@ class SearchController extends Controller
                 foreach ($clients as $client) {
                     $results['clients'][] = [
                         'id' => $client->id,
-                        'title' => $client->first_name . ' ' . $client->last_name
+                        'title' => $client->first_name . ' ' . $client->last_name,
+                        'email' => $client->email
                     ];
                 }
             }

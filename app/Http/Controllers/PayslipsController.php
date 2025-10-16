@@ -11,25 +11,26 @@ use App\Services\DeletionService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 
 class PayslipsController extends Controller
 {
-  protected $workspace;
-protected $user;
+    protected $workspace;
+    protected $user;
 
-public function __construct()
-{
-    $this->middleware(function ($request, $next) {
-        // Use helper function to get workspace ID
-        $workspaceId = getWorkspaceId();
-        $this->workspace = Workspace::find($workspaceId);
-        // dd($this->workspace);
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            // Use helper function to get workspace ID
+            $workspaceId = getWorkspaceId();
+            $this->workspace = Workspace::find($workspaceId);
+            // dd($this->workspace);
 
-        $this->user = getAuthenticatedUser();
+            $this->user = getAuthenticatedUser();
 
-        return $next($request);
-    });
-}
+            return $next($request);
+        });
+    }
     public function index(Request $request)
     {
         $payslips = isAdminOrHasAllDataAccess() ? $this->workspace->payslips() : $this->user->payslips();
@@ -90,58 +91,58 @@ public function __construct()
      * @response 500 scenario="Error" {"error": true, "message": "An error occurred: ..."}
      */
     public function store(Request $request)
-{
-    $isApi = $request->get('isApi', false);
-    $adminId = getAdminIdByUserRole();
+    {
+        $isApi = $request->get('isApi', false);
+        $adminId = getAdminIdByUserRole();
 
-    try {
-        $formFields = $request->validate([
-            'user_id' => ['required'],
-            'month' => ['required'],
-            'basic_salary' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'working_days' => ['required'],
-            'lop_days' => ['required'],
-            'paid_days' => ['required'],
-            'bonus' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'incentives' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'leave_deduction' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'ot_hours' => ['required'],
-            'ot_rate' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'ot_payment' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'total_allowance' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'total_deductions' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'total_earnings' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'net_pay' => ['required', 'regex:/^\d+(\.\d+)?$/'],
-            'payment_method_id' => ['nullable', 'required_if:status,1'],
-            'payment_date' => ['nullable', 'required_if:status,1'],
-            'status' => ['required'],
-            'note' => ['nullable']
-        ], [
-            'user_id.required' => 'The user field is required.',
-            'payment_date.required_if' => 'The payment date is required when status is paid.',
-            'payment_method_id.required_if' => 'The payment method is required when status is paid.',
-        ]);
+        try {
+            $formFields = $request->validate([
+                'user_id' => ['required'],
+                'month' => ['required'],
+                'basic_salary' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'working_days' => ['required'],
+                'lop_days' => ['required'],
+                'paid_days' => ['required'],
+                'bonus' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'incentives' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'leave_deduction' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'ot_hours' => ['required'],
+                'ot_rate' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'ot_payment' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'total_allowance' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'total_deductions' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'total_earnings' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'net_pay' => ['required', 'regex:/^\d+(\.\d+)?$/'],
+                'payment_method_id' => ['nullable', 'required_if:status,1'],
+                'payment_date' => ['nullable', 'required_if:status,1'],
+                'status' => ['required'],
+                'note' => ['nullable']
+            ], [
+                'user_id.required' => 'The user field is required.',
+                'payment_date.required_if' => 'The payment date is required when status is paid.',
+                'payment_method_id.required_if' => 'The payment method is required when status is paid.',
+            ]);
 
-        $status = $request->input('status');
-        $payment_date = $request->input('payment_date');
+            $status = $request->input('status');
+            $payment_date = $request->input('payment_date');
 
-        if ($status == '0') {
-            $formFields['payment_date'] = null;
-            $formFields['payment_method_id'] = null;
-        } elseif (!empty($payment_date)) {
-            $formFields['payment_date'] = format_date($payment_date, false, app('php_date_format'), 'Y-m-d');
-        }
+            if ($status == '0') {
+                $formFields['payment_date'] = null;
+                $formFields['payment_method_id'] = null;
+            } elseif (!empty($payment_date)) {
+                $formFields['payment_date'] = format_date($payment_date, false, app('php_date_format'), 'Y-m-d');
+            }
 
-        $formFields['workspace_id'] = $this->workspace->id;
-        $formFields['admin_id'] = $adminId;
-        $formFields['created_by'] = isClient() ? 'c_' . $this->user->id : 'u_' . $this->user->id;
+            $formFields['workspace_id'] = $this->workspace->id;
+            $formFields['admin_id'] = $adminId;
+            $formFields['created_by'] = isClient() ? 'c_' . $this->user->id : 'u_' . $this->user->id;
 
-        $allowance_ids = $request->input('allowances', []);
-        $deduction_ids = $request->input('deductions', []);
+            $allowance_ids = $request->input('allowances', []);
+            $deduction_ids = $request->input('deductions', []);
 
-        $payslip = Payslip::create($formFields);
+            $payslip = Payslip::create($formFields);
 
-        if ($payslip) {
+            if ($payslip) {
                 $payslip->allowances()->attach(
 
                     collect($allowance_ids)->mapWithKeys(fn($id) => [$id => ['admin_id' => $adminId]])
@@ -150,42 +151,44 @@ public function __construct()
                     collect($deduction_ids)->mapWithKeys(fn($id) => [$id => ['admin_id' => $adminId]])
                 );
 
-            Session::flash('message', 'Payslip created successfully.');
+                Session::flash('message', 'Payslip created successfully.');
 
-            if ($isApi) {
-                return formatApiResponse(false, 'Payslip created successfully.', [
-                    'id' => $payslip->id,
-                    'data' => formatPayslip($payslip),
-                ]);
+                if ($isApi) {
+                    return formatApiResponse(false, 'Payslip created successfully.', [
+                        'id' => $payslip->id,
+                        'data' => formatPayslip($payslip),
+                    ]);
+                } else {
+                    return response()->json([
+                        'error' => false,
+                        'message' => 'Payslip created successfully.',
+                        'id' => $payslip->id,
+                        'data' => $payslip
+                    ]);
+                }
             } else {
-                return response()->json([
-                    'error' => false,
-                    'message' => 'Payslip created successfully.',
-                    'id' => $payslip->id,
-                    'data' => $payslip
-                ]);
+                if ($isApi) {
+                    return formatApiResponse(true, 'Payslip couldn\'t be created.', [], 400);
+                } else {
+                    return response()->json([
+                        'error' => true,
+                        'message' => 'Payslip couldn\'t be created.'
+                    ], 400);
+                }
             }
-        } else {
+        } catch (ValidationException $e) {
+            return formatApiValidationError($isApi, $e->errors());
+        } catch (\Throwable $e) {
             if ($isApi) {
-                return formatApiResponse(true, 'Payslip couldn\'t be created.', [], 400);
+                return formatApiResponse(true, 'An error occurred: ' . $e->getMessage(), [], 500);
             } else {
                 return response()->json([
                     'error' => true,
-                    'message' => 'Payslip couldn\'t be created.'
-                ], 400);
+                    'message' => 'An error occurred: ' . $e->getMessage()
+                ], 500);
             }
         }
-    } catch (\Throwable $e) {
-        if ($isApi) {
-            return formatApiResponse(true, 'An error occurred: ' . $e->getMessage(), [], 500);
-        } else {
-            return response()->json([
-                'error' => true,
-                'message' => 'An error occurred: ' . $e->getMessage()
-            ], 500);
-        }
     }
-}
 
 
     public function list()
@@ -205,8 +208,8 @@ public function __construct()
             'payment_methods.title as payment_method'
         )
             ->leftJoin('users', 'payslips.user_id', '=', 'users.id')
-        ->leftJoin('payment_methods', 'payslips.payment_method_id', '=', 'payment_methods.id')
-        ->where('payslips.workspace_id', $this->workspace->id);
+            ->leftJoin('payment_methods', 'payslips.payment_method_id', '=', 'payment_methods.id')
+            ->where('payslips.workspace_id', $this->workspace->id);
 
         // Apply filters
         if ($status !== null) {
@@ -651,15 +654,15 @@ public function __construct()
                 if (!isAdminOrHasAllDataAccess()) {
                     $payslips->where(function ($query) {
                         $query->where('payslips.created_by', isClient() ? 'c_' . $this->user->id : 'u_' . $this->user->id)
-                              ->orWhere('payslips.user_id', $this->user->id);
+                            ->orWhere('payslips.user_id', $this->user->id);
                     });
                 }
 
                 if ($search) {
                     $payslips->where(function ($query) use ($search) {
                         $query->where('payslips.id', 'like', '%' . $search . '%')
-                              ->orWhere('payslips.note', 'like', '%' . $search . '%')
-                              ->orWhere('payment_methods.title', 'like', '%' . $search . '%');
+                            ->orWhere('payslips.note', 'like', '%' . $search . '%')
+                            ->orWhere('payment_methods.title', 'like', '%' . $search . '%');
                     });
                 }
 
@@ -668,7 +671,9 @@ public function __construct()
                 $paginated = $payslips->orderBy($sort, $order)
                     ->paginate($limit);
 
-                $rows = collect($paginated->items())->map(function($p) { return formatPayslip($p); });
+                $rows = collect($paginated->items())->map(function ($p) {
+                    return formatPayslip($p);
+                });
 
                 return formatApiResponse(false, 'Payslips fetched successfully.', [
                     'rows' => $rows,
@@ -679,8 +684,4 @@ public function __construct()
             return formatApiResponse(true, 'An error occurred: ' . $e->getMessage(), [], 500);
         }
     }
-
-
-
-
 }

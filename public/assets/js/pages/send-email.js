@@ -31,7 +31,7 @@ $("#templateSelector").on("change", function () {
 $('#previewBtn').click(function () {
         previewEmail();
     });
-    
+
 $(function () {
     if ($(".to_emails").length) {
         initEmailSelect2(
@@ -50,7 +50,7 @@ function initEmailSelect2(
     ajaxUrl = "/search",
     placeholderText = LABEL_CONSTANTS.pleaseEnterName,
     allowClear = true,
-    minimumInputLength = 1,
+    minimumInputLength = 0,
     initialData = false,
     extraData = () => ({})
 ) {
@@ -80,25 +80,25 @@ function initEmailSelect2(
             },
             processResults: function (data, params) {
                 params.page = params.page || 1;
-                
+
                 // Handle the response from your SearchController
                 let results = [];
-                
+
                 if (data.results && data.results.users) {
                     results = data.results.users.map(function (user) {
                         return {
                             id: user.email,
                             text: user.email,
                             email: user.email,
-                            name: user.title
+
                         };
                     });
                 }
-                
+
                 // Also handle clients if they have emails
                 if (data.results && data.results.clients) {
                     const clientResults = data.results.clients
-                        .filter(client => client.email) 
+                        .filter(client => client.email)
                         .map(function (client) {
                             return {
                                 id: client.email,
@@ -109,7 +109,6 @@ function initEmailSelect2(
                         });
                     results = results.concat(clientResults);
                 }
-                
                 return {
                     results: results,
                     pagination: {
@@ -123,13 +122,13 @@ function initEmailSelect2(
         createTag: function (params) {
             const term = $.trim(params.term);
             if (term === "") return null;
-            
+
             // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (emailRegex.test(term)) {
-                return { 
-                    id: term, 
-                    text: term, 
+                return {
+                    id: term,
+                    text: term,
                     newTag: true,
                     email: term
                 };
@@ -146,7 +145,7 @@ function initEmailSelect2(
         escapeMarkup: (markup) => markup,
     });
 
-    
+
     if (initialData) {
         $.ajax({
             url: ajaxUrl,
@@ -160,7 +159,7 @@ function initEmailSelect2(
             success: function (data) {
                 if (data.results && data.results.users) {
                     const initialEmails = data.results.users.map((user) => ({
-                        id: user.email,
+                        id: user.id,
                         text: user.email ,
                     }));
                     initialEmails.forEach((item) => {
@@ -274,7 +273,7 @@ function initCustomEmailTab() {
      $('#emailForm').submit(function (e) {
         validateScheduledEmail(e, this, '#scheduleToggle');
     });
-    
+
     // Initialize select2 for email recipients
     initEmailSelect2('.to_emails');
 

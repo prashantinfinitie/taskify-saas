@@ -8,6 +8,7 @@ use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Services\DeletionService;
 use App\Http\Controllers\Controller;
+use Dotenv\Exception\ValidationException;
 use Illuminate\Support\Facades\Session;
 
 class AllowancesController extends Controller
@@ -111,6 +112,8 @@ public function __construct()
                     ]);
                 }
             }
+        } catch (ValidationException $e) {
+            return formatApiValidationError($isApi, $e->errors());
         } catch (\Throwable $e) {
             if ($request->get('isApi', false)) {
                 return formatApiResponse(true, 'An error occurred: ' . $e->getMessage(), [], 500);

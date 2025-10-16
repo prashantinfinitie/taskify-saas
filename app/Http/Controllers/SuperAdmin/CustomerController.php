@@ -221,7 +221,10 @@ class CustomerController extends Controller
      */
     public function destroy(string $id)
     {
+        $adminUser = Admin::with('teamMembers')->where('user_id', $id)->first();
+        $teamMembers = $adminUser->teamMembers()->pluck('user_id')->toArray();
         $response = DeletionService::delete(User::class, $id, 'Record');
+        User::whereIn('id', $teamMembers)->delete();
         return response()->json(['error' => false, 'message' => 'Record deleted successfully.']);
         // return response()->json(['success' => true, 'message' => 'Deleted record successfully', 'redirect_url' => route('customers.index')]);
     }

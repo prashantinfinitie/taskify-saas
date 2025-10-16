@@ -19,7 +19,6 @@ return new class extends Migration
 
             // Define foreign key constraints
             $table->foreign('admin_id')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             // Add unique constraint to ensure each user is associated with only one admin
             $table->unique(['admin_id', 'user_id']);

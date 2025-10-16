@@ -1,0 +1,11 @@
+{
+    "name": "Taskify - Asset Management",
+    "slug": "asset-management",
+    "description": "Manages company assets, categories, assignments, and tracking.",
+    "version": "1.0.0",
+    "enabled": true,
+    "provider": "Plugins\\AssetManagement\\Providers\\AssetServiceProvider",
+    "publish_tag": "asset-assets",
+    "module":"assets"
+}
+

@@ -68,6 +68,7 @@ class EmailSendController extends Controller
     public function store(Request $request)
     {
         try {
+
             $general_settings = get_settings('general_settings');
             $maxFileSizeBytes = config('media-library.max_file_size');
             $maxFileSizeKb = (int) ($maxFileSizeBytes / 1024);
@@ -107,6 +108,8 @@ class EmailSendController extends Controller
             ];
 
             $data = $request->validate($rules, $messages);
+
+
 
             // Validate file extensions (BLOCK zip, exe, bat, etc.)
             $blockedExtensions = ['zip', 'exe', 'bat', 'cmd', 'scr', 'com', 'pif', 'jar', 'js', 'php', 'html', 'htm', 'vbs', 'wsf', 'wsh', 'cmd', 'cpl', 'reg', 'dll'];

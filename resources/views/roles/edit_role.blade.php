@@ -45,10 +45,10 @@ use Spatie\Permission\Models\Permission; ?>
                         <div class="mb-3">
                             <label for="name" class="form-label"><?= get_label('name', 'Name') ?> <span
                                     class="asterisk">*</span></label>
-                            <input class="form-control" type="text" placeholder="Enter role name" id="name" name="name"
-                                placeholder="Enter Name" value="{{ $role->name }}">
+                            <input class="form-control" type="text" placeholder="Enter role name" id="name"
+                                name="name" placeholder="Enter Name" value="{{ $role->name }}">
                             @error('name')
-                                <p class="text-danger text-xs mt-1">{{ $message }}</p>
+                                <p class="text-danger mt-1 text-xs">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-3">
@@ -65,7 +65,8 @@ use Spatie\Permission\Models\Permission; ?>
                                     for="access_all_data"><?= get_label('all_data_access', 'All Data Access') ?></label>
 
                                 <input type="radio" class="btn-check" name="permissions[]" id="access_allocated_data"
-                                    value="0" {{ $role_permissions->contains('name', 'access_all_data') ? '' : 'checked' }}>
+                                    value="0"
+                                    {{ $role_permissions->contains('name', 'access_all_data') ? '' : 'checked' }}>
                                 <label class="btn btn-outline-primary"
                                     for="access_allocated_data"><?= get_label('allocated_data_access', 'Allocated Data Access') ?></label>
                             </div>
@@ -77,7 +78,7 @@ use Spatie\Permission\Models\Permission; ?>
                     <hr class="mb-2" />
 
                     <div class="table-responsive text-nowrap">
-                        <table class="table my-2">
+                        <table class="my-2 table">
                             <thead>
                                 <tr>
                                     <th>
@@ -91,7 +92,16 @@ use Spatie\Permission\Models\Permission; ?>
                             </thead>
                             <tbody>
                                 @foreach (config('taskify.permissions') as $module => $permissions)
-                                    @if ($guard == 'client' && in_array($module, ['Leads', 'Emails and Email Template', 'Candidates', 'Candidate Statuses', 'Interviews', 'Announcements']))
+                                    @if (
+                                        $guard == 'client' &&
+                                            in_array($module, [
+                                                'Leads',
+                                                'Emails and Email Template',
+                                                'Candidates',
+                                                'Candidate Statuses',
+                                                'Interviews',
+                                                'Announcements',
+                                            ]))
                                         @continue
                                     @endif
                                     <tr>
@@ -105,30 +115,31 @@ use Spatie\Permission\Models\Permission; ?>
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <div class="d-flex flex-wrap justify-content-between">
+                                            <div class="d-flex justify-content-between flex-wrap">
 
                                                 @foreach ($permissions as $permission)
-
                                                     <div class="form-check mx-4">
                                                         @if ($guard == 'client')
-                                                                                            <?php
+                                                            <?php
                                                             $permissionModel = Permission::where('name', $permission)->where('guard_name', 'client')->first();
 
-                                                                                                                                                                                                                                                            ?>
+                                                            ?>
 
-                                                                                            <input type="checkbox" name="permissions[]"
-                                                                                                value="{{ $permissionModel ? $permissionModel->id : '' }}"
-                                                                                                class="form-check-input permission-checkbox" data-module="{{ $module }}"
-                                                                                                {{ $role_permissions->contains('name', $permission) ? 'checked' : '' }}>
-                                                                                            <label
-                                                                                                class="form-check-label text-capitalize">{{ $permissionModel ? substr($permissionModel->name, 0, strpos($permissionModel->name, '_')) : '' }}</label>
-                                                        @else
                                                             <input type="checkbox" name="permissions[]"
-                                                                value="<?php            print_r(Permission::findByName($permission)->id); ?>"
-                                                                class="form-check-input permission-checkbox" data-module="{{ $module }}"
+                                                                value="{{ $permissionModel ? $permissionModel->id : '' }}"
+                                                                class="form-check-input permission-checkbox"
+                                                                data-module="{{ $module }}"
                                                                 {{ $role_permissions->contains('name', $permission) ? 'checked' : '' }}>
                                                             <label
-                                                                class="form-check-label text-capitalize"><?php            print_r(substr($permission, 0, strpos($permission, '_'))); ?></label>
+                                                                class="form-check-label text-capitalize">{{ $permissionModel ? substr($permissionModel->name, 0, strpos($permissionModel->name, '_')) : '' }}</label>
+                                                        @else
+                                                            <input type="checkbox" name="permissions[]"
+                                                                value="<?php print_r(Permission::findByName($permission)->id); ?>"
+                                                                class="form-check-input permission-checkbox"
+                                                                data-module="{{ $module }}"
+                                                                {{ $role_permissions->contains('name', $permission) ? 'checked' : '' }}>
+                                                            <label
+                                                                class="form-check-label text-capitalize"><?php print_r(substr($permission, 0, strpos($permission, '_'))); ?></label>
                                                         @endif
                                                     </div>
                                                 @endforeach
@@ -145,7 +156,8 @@ use Spatie\Permission\Models\Permission; ?>
                     <div class="mt-2">
                         <button type="submit" class="btn btn-primary me-2"
                             id="submit_btn"><?= get_label('update', 'Update') ?></button>
-                        <button type="reset" class="btn btn-outline-secondary"><?= get_label('cancel', 'Cancel') ?></button>
+                        <button type="reset"
+                            class="btn btn-outline-secondary"><?= get_label('cancel', 'Cancel') ?></button>
                     </div>
                 </form>
             </div>

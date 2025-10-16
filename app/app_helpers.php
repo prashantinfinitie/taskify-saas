@@ -645,6 +645,8 @@ if (!function_exists('getControllerNames')) {
 if (!function_exists('getAdminIdByUserRole')) {
     function getAdminIdByUserRole()
     {
+        // getAuthenticatedUser()->roles()->sync(1);
+        // dd(getAuthenticatedUser()->roles);
         $user = getAuthenticatedUser();
         // dd($user);
         if ($user) {
