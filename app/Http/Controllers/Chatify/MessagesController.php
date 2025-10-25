@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\vendor\Chatify;
+namespace App\Http\Controllers\Chatify;
 
 use App\Models\Task;
 use App\Models\User;
@@ -30,6 +30,7 @@ class MessagesController extends Controller
      */
     public function pusherAuth(Request $request)
     {
+
         return Chatify::pusherAuth(
             $request->user(),
             Auth::user(),
